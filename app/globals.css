@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/*
+ * Viki "1b — Fresh" design tokens.
+ * Tailwind v4 CSS-first config: @theme maps tokens to utility classes
+ * (e.g. bg-brand, text-ink), and :root exposes them as raw CSS variables.
+ */
+@theme {
+  --color-brand: #2f6b4f;
+  --color-ink: #141414;
+  --color-muted: #767676;
+  --color-subtle: #5a5a5a;
+  --color-line: #ececec;
+  --color-line-strong: #e2e2e2;
+  --color-surface: #ffffff;
+  --color-surface-alt: #fafafa;
+
+  --radius-card: 16px;
+  --radius-btn: 10px;
+  --radius-pill: 999px;
+
+  --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-body: var(--font-hanken-grotesk), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+* {
+  box-sizing: border-box;
+}
