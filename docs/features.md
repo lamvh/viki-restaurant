@@ -20,3 +20,4 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | SEO meta | Per-page title/description/canonical, OG + Twitter cards | ⬜ |
 | Structured data | JSON-LD Restaurant (home) + Menu (menu page) | ⬜ |
 | Crawl files | `sitemap.xml` + `robots.txt` (noindex transactional pages) | ⬜ |
+| Test suite | 46 tests: pricing, store, line-builder + RTL (modal, drawer, summary, guard) | ✅ |

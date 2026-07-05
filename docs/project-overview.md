@@ -40,4 +40,4 @@ directions 1a/1c, delivery geocoding / live ETA, admin.
 | 03 | Layout chrome + homepage | Complete |
 | 04 | Menu + item modal | Complete |
 | 05 | Cart drawer + checkout + confirmation | Complete |
-| 06 | Component tests + docs + responsive QA | Pending |
+| 06 | Component tests + docs + responsive QA | Complete |

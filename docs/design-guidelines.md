@@ -38,6 +38,22 @@ so they are available both as utilities (`bg-brand`, `text-ink`) and raw CSS var
 otherwise a styled placeholder box. External hosts allowed via `next.config.ts`
 `remotePatterns` (`assets.foodhub.com`).
 
+## Responsive
+
+Layouts are **mobile-first**; breakpoints layer richer layouts on top:
+
+- Base (mobile): single-column stacks; hero, story, and location sections collapse to
+  one column; item modal is a bottom sheet; cart drawer is full-width.
+- `sm` (≥640px): service toggle appears in header; dish grid → 2 columns.
+- `md` (≥768px): hero/story/location → 2 columns; checkout → form + sticky summary;
+  item modal centers as a dialog.
+- `lg` (≥1024px): popular-dishes grid → 3 columns.
+- Content width capped at `max-w-6xl` (chrome/home) / `max-w-4xl`–`max-w-5xl`
+  (menu/checkout); horizontal scroll avoided (category chips scroll within their bar).
+
+Overlays lock body scroll while open and trap focus. Recommended QA: a manual pass on
+real devices / responsive mode across the flow before launch.
+
 ## Tailwind version note
 
 Using Tailwind **v4** (`@tailwindcss/postcss`, CSS-first). If v4 is ever blocked, fall

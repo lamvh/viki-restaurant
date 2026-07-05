@@ -4,6 +4,12 @@ All notable changes to this project are recorded here, newest first.
 
 ## 2026-07-05
 
+- **Component tests + QA:** Added React Testing Library tests for the interactive
+  components — item modal (option pricing → store commit, qty), cart drawer (lines,
+  empty state, totals, delivery-min disable), order summary (discount/fee/points), and
+  a checkout-guard regression test locking the just-placed navigation fix. Suite now 46
+  tests (pricing, store, line-builder, 4 RTL files); RTL auto-cleanup wired in
+  `vitest.setup.ts`. Responsive layouts are mobile-first (see design-guidelines).
 - **Cart, checkout & confirmation:** Global cart drawer (slide-in, focus-trapped) with
   per-line qty controls, empty state, live order summary, and delivery-minimum block.
   `/checkout` (details + payment + sticky summary, client validation, delivery address
