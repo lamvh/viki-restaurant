@@ -46,6 +46,7 @@ Living docs are maintained under [`docs/`](./docs):
 - [`codebase-summary.md`](./docs/codebase-summary.md) — directory guide + conventions
 - [`features.md`](./docs/features.md) — feature list with status
 - [`design-guidelines.md`](./docs/design-guidelines.md) — tokens, typography, the 1b direction
+- [`seo-guidelines.md`](./docs/seo-guidelines.md) — SEO meta, Open Graph, JSON-LD conventions
 - [`changelog.md`](./docs/changelog.md) — dated record of changes
 
 The design spec lives at

@@ -4,6 +4,7 @@ import './globals.css';
 import { PromoBar } from '@/components/layout/promo-bar';
 import { SiteHeader } from '@/components/layout/site-header';
 import { SiteFooter } from '@/components/layout/site-footer';
+import { ItemModal } from '@/components/menu/item-modal';
 
 // Self-hosted Google fonts exposed as CSS variables consumed by globals.css.
 const instrumentSerif = Instrument_Serif({
@@ -37,7 +38,8 @@ export default function RootLayout({
         <SiteHeader />
         {children}
         <SiteFooter />
-        {/* TODO(phase-05): cart drawer + item modal overlays mount here */}
+        <ItemModal />
+        {/* TODO(phase-05): cart drawer overlay mounts here */}
       </body>
     </html>
   );

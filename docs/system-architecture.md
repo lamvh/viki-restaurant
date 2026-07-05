@@ -47,6 +47,21 @@ order → `/`.
   hydration mismatch.
 - Cart drawer + item modal overlays: _added in Phases 04–05._
 
+## SEO
+
+As a marketing site, SEO is built in via the Next 15 Metadata API:
+
+- Global metadata in `app/layout.tsx` (`metadataBase`, title template, Open Graph,
+  Twitter card, robots, icons).
+- Per-page `metadata`/`generateMetadata` with unique title/description/canonical;
+  `/checkout` and `/order/confirmed` are `noindex`.
+- JSON-LD structured data (Restaurant on home, Menu on `/menu`) derived from
+  `data/restaurant.ts` + `data/menu.ts` (kept in a `lib/structured-data.ts` module).
+- `app/sitemap.ts` and `app/robots.ts` generate `/sitemap.xml` and `/robots.txt`.
+- Canonical origin from `NEXT_PUBLIC_SITE_URL`.
+
+See [`seo-guidelines.md`](./seo-guidelines.md) for the full conventions.
+
 ## Toolchain (Phase 01)
 
 - Styling pipeline: `postcss.config.mjs` → `@tailwindcss/postcss`; tokens in

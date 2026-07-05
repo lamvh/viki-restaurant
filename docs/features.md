@@ -7,8 +7,8 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | Project scaffold | Runnable Next.js 15 app, tooling, tokens, fonts, test harness | ✅ |
 | Homepage | Hero, popular dishes, story band, location (1b Fresh) | ✅ |
 | Layout chrome | Promo bar, sticky header (cart + service), footer | ✅ |
-| Menu page | Category chips + item rows | ⬜ |
-| Item modal | Option groups, qty, special instructions; live price | ⬜ |
+| Menu page | Sticky category chips (scrollspy) + item rows | ✅ |
+| Item modal | Option groups, qty, special instructions; live price | ✅ |
 | Cart drawer | Line qty controls, empty state, live totals | ⬜ |
 | Checkout | Details + payment + live order summary (pickup & delivery) | ⬜ |
 | Order confirmation | Success screen reading last order from store | ⬜ |
@@ -17,3 +17,6 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | Cart store | Zustand: add/inc/dec/remove, service, placeOrder | ✅ |
 | Cart persistence | Service + cart + last order via `localStorage` | ✅ |
 | Route guards | Empty-cart / no-order redirects | ⬜ |
+| SEO meta | Per-page title/description/canonical, OG + Twitter cards | ⬜ |
+| Structured data | JSON-LD Restaurant (home) + Menu (menu page) | ⬜ |
+| Crawl files | `sitemap.xml` + `robots.txt` (noindex transactional pages) | ⬜ |

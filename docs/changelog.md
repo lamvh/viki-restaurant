@@ -4,6 +4,17 @@ All notable changes to this project are recorded here, newest first.
 
 ## 2026-07-05
 
+- **SEO scope added:** Confirmed Viki is a promotional/marketing site, so SEO is now a
+  first-class requirement. Added `docs/seo-guidelines.md` (Next 15 Metadata API
+  conventions: per-page meta + canonicals, Open Graph/Twitter cards, JSON-LD Restaurant
+  + Menu schema, `sitemap.xml` / `robots.txt`, `NEXT_PUBLIC_SITE_URL`). Registered as
+  plan Phase 07. Implementation pending.
+- **Menu + item modal:** `/menu` page with sticky category chips (IntersectionObserver
+  scrollspy) and tappable item rows. Global item-modal overlay (store-driven via
+  `modalItemId`) with option groups (single=radio / multi=checkbox), quantity stepper,
+  special instructions, and a live per-line total; "Add to order" commits a CartLine and
+  opens the cart. Pure `lib/build-cart-line.ts` implements the label/price/key rules
+  (9 unit tests). Store gains transient `modalItemId` + `openItem`/`closeItem` (not persisted).
 - **Layout chrome + homepage:** Promo bar, sticky store-wired header (cart count +
   service toggle, hydration-guarded), and footer mounted in root layout. Homepage
   composes hero, popular dishes (featured), story band, and location sections in the

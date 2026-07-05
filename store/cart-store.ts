@@ -11,6 +11,8 @@ type CartState = {
   service: Service;
   cart: CartLine[];
   cartOpen: boolean;
+  /** Id of the menu item whose customisation modal is open, or null. */
+  modalItemId: string | null;
   lastOrder: Order | null;
 
   setService: (service: Service) => void;
@@ -20,6 +22,8 @@ type CartState = {
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
+  openItem: (id: string) => void;
+  closeItem: () => void;
   placeOrder: () => Order | null;
 
   count: () => number;
@@ -37,6 +41,7 @@ export const useCartStore = create<CartState>()(
       service: 'pickup',
       cart: [],
       cartOpen: false,
+      modalItemId: null,
       lastOrder: null,
 
       setService: (service) => set({ service }),
@@ -73,6 +78,8 @@ export const useCartStore = create<CartState>()(
       clearCart: () => set({ cart: [] }),
       openCart: () => set({ cartOpen: true }),
       closeCart: () => set({ cartOpen: false }),
+      openItem: (id) => set({ modalItemId: id }),
+      closeItem: () => set({ modalItemId: null }),
 
       placeOrder: () => {
         const { cart, service } = get();

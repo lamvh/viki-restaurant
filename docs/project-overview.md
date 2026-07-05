@@ -6,12 +6,18 @@ Viki is a Vietnamese street-food restaurant in Glenfield Mall, Auckland. This pr
 is its standalone customer-facing website: a homepage plus a complete online ordering
 flow, built to the approved **"1b — Fresh"** visual direction.
 
+It is a **promotional / marketing website**, so search discoverability matters:
+proper SEO meta, Open Graph/Twitter cards, and JSON-LD structured data are a
+first-class requirement on every page. See [`seo-guidelines.md`](./seo-guidelines.md).
+
 ## Scope (current milestone)
 
 - Homepage (hero, popular dishes, story band, location)
 - Ordering flow: menu → item customisation modal → cart drawer → checkout → confirmation
 - Client-side pricing, discount, delivery fee, and loyalty-points logic
 - Cart/service persistence across refresh (`localStorage`)
+- SEO: per-page meta + canonicals, Open Graph/Twitter cards, JSON-LD (Restaurant +
+  Menu), `sitemap.xml`, `robots.txt`
 
 ## Out of scope (this milestone)
 
@@ -32,6 +38,6 @@ directions 1a/1c, delivery geocoding / live ETA, admin.
 | 01 | Project scaffold & tooling | Complete |
 | 02 | Data & logic core (menu, pricing, store) | Complete |
 | 03 | Layout chrome + homepage | Complete |
-| 04 | Menu + item modal | Pending |
+| 04 | Menu + item modal | Complete |
 | 05 | Cart drawer + checkout + confirmation | Pending |
 | 06 | Component tests + docs + responsive QA | Pending |
