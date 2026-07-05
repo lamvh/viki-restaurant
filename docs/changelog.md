@@ -4,6 +4,11 @@ All notable changes to this project are recorded here, newest first.
 
 ## 2026-07-05
 
+- **Layout chrome + homepage:** Promo bar, sticky store-wired header (cart count +
+  service toggle, hydration-guarded), and footer mounted in root layout. Homepage
+  composes hero, popular dishes (featured), story band, and location sections in the
+  "1b Fresh" direction. Shared UI primitives: `image-slot` (real/placeholder),
+  `dish-card`, `tag-badge`, `money`. Homepage serves 200 with all sections; build clean.
 - **Data & logic core:** Typed menu (`data/menu/*`, 6 categories / 27 items, featured
   lookup), pure pricing module (`lib/pricing.ts` — subtotal, ≥$30 discount, delivery
   fee, points, $5 delivery minimum, ETA), money formatter, and Zustand cart store

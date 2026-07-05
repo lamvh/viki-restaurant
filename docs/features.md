@@ -5,7 +5,8 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | Feature | Description | Status |
 |---|---|---|
 | Project scaffold | Runnable Next.js 15 app, tooling, tokens, fonts, test harness | ✅ |
-| Homepage | Hero, popular dishes, story band, location (1b Fresh) | ⬜ |
+| Homepage | Hero, popular dishes, story band, location (1b Fresh) | ✅ |
+| Layout chrome | Promo bar, sticky header (cart + service), footer | ✅ |
 | Menu page | Category chips + item rows | ⬜ |
 | Item modal | Option groups, qty, special instructions; live price | ⬜ |
 | Cart drawer | Line qty controls, empty state, live totals | ⬜ |

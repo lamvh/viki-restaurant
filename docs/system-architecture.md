@@ -36,7 +36,16 @@ order → `/`.
 
 ## Component map
 
-_TBD — populated in Phases 03–05._ See design spec §7 for the target structure.
+- `components/layout/` — `promo-bar` (server), `site-header` (client: cart count +
+  service toggle, hydration-guarded), `service-toggle` (client), `site-footer` (server).
+  Chrome mounts in `app/layout.tsx`.
+- `components/home/` — `hero`, `popular-dishes`, `story-band`, `location-block` (server);
+  composed in `app/page.tsx`.
+- `components/ui/` — `image-slot` (client: real image or placeholder + load fallback),
+  `dish-card`, `tag-badge`, `money`.
+- `lib/use-hydrated.ts` — client hook gating persisted-store display to avoid SSR
+  hydration mismatch.
+- Cart drawer + item modal overlays: _added in Phases 04–05._
 
 ## Toolchain (Phase 01)
 

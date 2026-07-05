@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, Hanken_Grotesk } from 'next/font/google';
 import './globals.css';
+import { PromoBar } from '@/components/layout/promo-bar';
+import { SiteHeader } from '@/components/layout/site-header';
+import { SiteFooter } from '@/components/layout/site-footer';
 
 // Self-hosted Google fonts exposed as CSS variables consumed by globals.css.
 const instrumentSerif = Instrument_Serif({
@@ -30,9 +33,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${instrumentSerif.variable} ${hankenGrotesk.variable}`}>
       <body>
-        {/* TODO(phase-03): promo bar + site header mount here */}
+        <PromoBar />
+        <SiteHeader />
         {children}
-        {/* TODO(phase-03/05): site footer, cart drawer + item modal overlays mount here */}
+        <SiteFooter />
+        {/* TODO(phase-05): cart drawer + item modal overlays mount here */}
       </body>
     </html>
   );
