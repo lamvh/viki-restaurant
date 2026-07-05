@@ -78,15 +78,19 @@ only for interactivity), use `next/font` (self-hosted, no layout shift — alrea
 ## 7. Environment
 
 - `NEXT_PUBLIC_SITE_URL` — canonical production origin (e.g. `https://viki.co.nz`).
-  Used by `metadataBase`, `sitemap`, `robots`, and JSON-LD `url`. Falls back to a
-  sensible default in development.
+  Used by `metadataBase`, `sitemap`, `robots`, and JSON-LD `url`. Falls back to
+  `http://localhost:3000` in development.
+  **Gotcha:** `NEXT_PUBLIC_*` values are inlined at **build** time, so this must be set
+  in the build environment (not just at runtime) for production URLs to be correct.
 
 ## Status
 
-- [ ] Global metadata (metadataBase, OG, Twitter, robots, icons)
-- [ ] Per-page metadata + canonicals (home, menu, checkout, confirmed)
-- [ ] JSON-LD: Restaurant (home) + Menu (menu page)
-- [ ] `sitemap.ts` + `robots.ts`
-- [ ] `NEXT_PUBLIC_SITE_URL` wired
+- [x] Global metadata (metadataBase, OG, Twitter, robots) — `app/layout.tsx`
+- [x] Per-page canonicals + `noindex` on checkout/confirmed
+- [x] JSON-LD: Restaurant (home) + Menu (menu page) — `lib/structured-data.ts`
+- [x] `sitemap.ts` + `robots.ts`
+- [x] `NEXT_PUBLIC_SITE_URL` wired (`lib/site.ts`, `.env.example`)
+- [x] Generated OG/Twitter image (`app/opengraph-image.tsx`, `next/og`)
+- [ ] Favicon / apple-touch-icon assets (add real brand icons before launch)
 
 _Added 2026-07-05 per product direction: Viki is a promotional site — SEO is required._

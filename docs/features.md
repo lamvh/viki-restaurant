@@ -17,7 +17,8 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | Cart store | Zustand: add/inc/dec/remove, service, placeOrder | ✅ |
 | Cart persistence | Service + cart + last order via `localStorage` | ✅ |
 | Route guards | Empty-cart / no-order redirects (hydration-safe) | ✅ |
-| SEO meta | Per-page title/description/canonical, OG + Twitter cards | ⬜ |
-| Structured data | JSON-LD Restaurant (home) + Menu (menu page) | ⬜ |
-| Crawl files | `sitemap.xml` + `robots.txt` (noindex transactional pages) | ⬜ |
+| SEO meta | Per-page title/description/canonical, OG + Twitter cards | ✅ |
+| Structured data | JSON-LD Restaurant (home) + Menu (menu page) | ✅ |
+| Crawl files | `sitemap.xml` + `robots.txt` (noindex transactional pages) | ✅ |
+| Social image | Generated OG/Twitter image (next/og, 1200×630) | ✅ |
 | Test suite | 46 tests: pricing, store, line-builder + RTL (modal, drawer, summary, guard) | ✅ |

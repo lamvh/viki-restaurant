@@ -28,7 +28,7 @@ item modal → cart → checkout → confirmation) with client-side pricing/loya
 | 04 | Menu + item modal | 4h | ✅ complete | 02, 03 |
 | 05 | Cart drawer + checkout + confirmation | 5h | ✅ complete | 02, 03, 04 |
 | 06 | Component tests + docs + responsive QA | 3h | ✅ complete | 03, 04, 05 |
-| 07 | SEO & structured data (meta, OG, JSON-LD, sitemap/robots) | 3h | pending | 03, 04, 05 |
+| 07 | SEO & structured data (meta, OG, JSON-LD, sitemap/robots) | 3h | ✅ complete | 03, 04, 05 |
 
 **Total effort:** 27h
 

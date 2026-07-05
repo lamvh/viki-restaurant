@@ -41,3 +41,4 @@ directions 1a/1c, delivery geocoding / live ETA, admin.
 | 04 | Menu + item modal | Complete |
 | 05 | Cart drawer + checkout + confirmation | Complete |
 | 06 | Component tests + docs + responsive QA | Complete |
+| 07 | SEO & structured data | Complete |

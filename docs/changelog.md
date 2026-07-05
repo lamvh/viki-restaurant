@@ -4,6 +4,14 @@ All notable changes to this project are recorded here, newest first.
 
 ## 2026-07-05
 
+- **SEO & structured data:** Implemented per `seo-guidelines.md`. Global metadata
+  (`metadataBase`, title template, Open Graph, Twitter `summary_large_image`, robots,
+  canonical) in root layout; per-page canonicals (`/`, `/menu`) and `noindex` on
+  `/checkout` + `/order/confirmed`. JSON-LD `Restaurant` (home) and `Menu` (menu page)
+  from `lib/structured-data.ts` (derived from restaurant + menu data). Generated
+  `sitemap.xml` (`/`, `/menu`), `robots.txt` (disallow `/checkout`, `/order/`), and a
+  self-contained `next/og` social image (1200×630). Canonical origin from
+  `NEXT_PUBLIC_SITE_URL` (`.env.example` added). Verified on a running server.
 - **Component tests + QA:** Added React Testing Library tests for the interactive
   components — item modal (option pricing → store commit, qty), cart drawer (lines,
   empty state, totals, delivery-min disable), order summary (discount/fee/points), and

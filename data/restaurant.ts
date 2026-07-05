@@ -7,9 +7,23 @@ export const RESTAURANT = {
   address: 'Glenfield Mall, 12 Bentley Ave, Glenfield, Auckland 0629',
   suburb: 'Glenfield, Auckland',
   phone: '(09) 444 0000',
+  // Human-readable hours for the UI.
   hours: [
     { days: 'Mon – Thu', time: '11:00 – 21:00' },
     { days: 'Fri – Sat', time: '11:00 – 21:30' },
     { days: 'Sunday', time: '11:00 – 20:30' },
+  ],
+  // Machine-readable address + hours for JSON-LD structured data.
+  postal: {
+    street: 'Glenfield Mall, 12 Bentley Ave',
+    locality: 'Glenfield',
+    region: 'Auckland',
+    postalCode: '0629',
+    country: 'NZ',
+  },
+  openingHours: [
+    { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'], opens: '11:00', closes: '21:00' },
+    { days: ['Friday', 'Saturday'], opens: '11:00', closes: '21:30' },
+    { days: ['Sunday'], opens: '11:00', closes: '20:30' },
   ],
 } as const;

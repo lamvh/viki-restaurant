@@ -6,6 +6,7 @@ import { SiteHeader } from '@/components/layout/site-header';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { ItemModal } from '@/components/menu/item-modal';
 import { CartDrawer } from '@/components/cart/cart-drawer';
+import { SITE_URL, SITE_NAME, SITE_LOCALE } from '@/lib/site';
 
 // Self-hosted Google fonts exposed as CSS variables consumed by globals.css.
 const instrumentSerif = Instrument_Serif({
@@ -21,10 +22,43 @@ const hankenGrotesk = Hanken_Grotesk({
   variable: '--font-hanken-grotesk',
 });
 
+const DESCRIPTION =
+  'Fresh Vietnamese street food in Glenfield Mall, Auckland — phở, bánh mì, rice & noodle bowls. Order pickup or delivery.';
+
 export const metadata: Metadata = {
-  title: 'Viki — Vietnamese Street Food, Glenfield',
-  description:
-    'Fresh Vietnamese street food in Glenfield Mall, Auckland. Order pickup or delivery.',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Viki — Vietnamese Street Food, Glenfield',
+    template: '%s · Viki',
+  },
+  description: DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    'Vietnamese food',
+    'Viki',
+    'Glenfield',
+    'Auckland',
+    'phở',
+    'bánh mì',
+    'street food',
+    'takeaway',
+    'delivery',
+  ],
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    locale: SITE_LOCALE,
+    url: '/',
+    title: 'Viki — Vietnamese Street Food, Glenfield',
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Viki — Vietnamese Street Food, Glenfield',
+    description: DESCRIPTION,
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
