@@ -43,9 +43,18 @@ order → `/`.
   composed in `app/page.tsx`.
 - `components/ui/` — `image-slot` (client: real image or placeholder + load fallback),
   `dish-card`, `tag-badge`, `money`.
-- `lib/use-hydrated.ts` — client hook gating persisted-store display to avoid SSR
-  hydration mismatch.
-- Cart drawer + item modal overlays: _added in Phases 04–05._
+- `components/menu/` — `category-chips` (client scrollspy), `menu-category` (server),
+  `menu-item-row` (client), `item-modal` (client global overlay), `option-group` (client).
+- `components/cart/` — `cart-drawer` (client global overlay), `cart-line` (client),
+  `order-summary` (client; totals via `lib/pricing`).
+- `components/checkout/` — `checkout-form`, `payment-methods`, `checkout-view` (guarded),
+  `order-confirmed-view` (guarded) — all client.
+- `app/checkout/page.tsx`, `app/order/confirmed/page.tsx` — server pages (`noindex`)
+  rendering the guarded client views.
+- `lib/use-hydrated.ts` — gates persisted-store display + route guards against SSR
+  mismatch. `lib/use-focus-trap.ts` — shared dialog/drawer focus management.
+- Overlays (item modal, cart drawer) mount in `app/layout.tsx`, driven by store flags
+  (`modalItemId`, `cartOpen`) that are not persisted.
 
 ## SEO
 

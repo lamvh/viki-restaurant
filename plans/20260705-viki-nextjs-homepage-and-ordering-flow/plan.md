@@ -26,7 +26,7 @@ item modal → cart → checkout → confirmation) with client-side pricing/loya
 | 02 | Data & logic core (testable) | 5h | ✅ complete | 01 |
 | 03 | Layout chrome + homepage | 4h | ✅ complete | 01, 02 |
 | 04 | Menu + item modal | 4h | ✅ complete | 02, 03 |
-| 05 | [Cart drawer + checkout + confirmation](./phase-05-cart-checkout-confirmation.md) | 5h | pending | 02, 03, 04 |
+| 05 | Cart drawer + checkout + confirmation | 5h | ✅ complete | 02, 03, 04 |
 | 06 | [Component tests + docs + responsive QA](./phase-06-tests-docs-responsive-qa.md) | 3h | pending | 03, 04, 05 |
 | 07 | SEO & structured data (meta, OG, JSON-LD, sitemap/robots) | 3h | pending | 03, 04, 05 |
 

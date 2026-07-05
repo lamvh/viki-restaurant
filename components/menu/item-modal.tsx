@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { MenuItem, OptionGroup as OptionGroupType } from '@/types/menu';
 import { useCartStore } from '@/store/cart-store';
 import { findItem } from '@/data/menu';
@@ -10,6 +10,7 @@ import {
   lineUnit,
   type Selections,
 } from '@/lib/build-cart-line';
+import { useFocusTrap } from '@/lib/use-focus-trap';
 import { OptionGroup } from './option-group';
 import { ImageSlot } from '@/components/ui/image-slot';
 import { Money } from '@/components/ui/money';
@@ -32,51 +33,7 @@ function ItemModalPanel({ item }: { item: MenuItem }) {
   );
   const [qty, setQty] = useState(1);
   const [notes, setNotes] = useState('');
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const panel = panelRef.current;
-    const focusable = () =>
-      Array.from(
-        panel?.querySelectorAll<HTMLElement>(
-          'button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])',
-        ) ?? [],
-      );
-
-    // Move focus into the dialog on open.
-    (focusable()[0] ?? panel)?.focus();
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closeItem();
-        return;
-      }
-      // Trap Tab within the dialog.
-      if (e.key === 'Tab') {
-        const items = focusable();
-        if (items.length === 0) return;
-        const first = items[0];
-        const last = items[items.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-      // Restore focus to the element that opened the modal (the menu row).
-      previouslyFocused?.focus?.();
-    };
-  }, [closeItem]);
+  const panelRef = useFocusTrap<HTMLDivElement>(closeItem);
 
   function toggle(group: OptionGroupType, choiceId: string) {
     setSelections((prev) => {

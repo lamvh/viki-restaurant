@@ -4,6 +4,13 @@ All notable changes to this project are recorded here, newest first.
 
 ## 2026-07-05
 
+- **Cart, checkout & confirmation:** Global cart drawer (slide-in, focus-trapped) with
+  per-line qty controls, empty state, live order summary, and delivery-minimum block.
+  `/checkout` (details + payment + sticky summary, client validation, delivery address
+  required) and `/order/confirmed` (order number, ETA, total, points) as server pages
+  (both `noindex`) rendering guarded client views — empty cart → `/menu`, no last order
+  → `/` (guards wait for hydration). Extracted shared `lib/use-focus-trap.ts` (reused by
+  modal + drawer). Full ordering flow now complete end-to-end.
 - **SEO scope added:** Confirmed Viki is a promotional/marketing site, so SEO is now a
   first-class requirement. Added `docs/seo-guidelines.md` (Next 15 Metadata API
   conventions: per-page meta + canonicals, Open Graph/Twitter cards, JSON-LD Restaurant

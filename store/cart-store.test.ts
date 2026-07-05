@@ -107,3 +107,38 @@ describe('placeOrder', () => {
     expect(state.lastOrder).toEqual(order);
   });
 });
+
+describe('justPlaced transition', () => {
+  it('is set by placeOrder so the checkout guard can defer the /menu redirect', () => {
+    const s = useCartStore.getState();
+    s.addLine(line({ qty: 1 }));
+    expect(useCartStore.getState().justPlaced).toBe(false);
+    useCartStore.getState().placeOrder();
+    expect(useCartStore.getState().justPlaced).toBe(true);
+  });
+
+  it('is cleared when a new order starts (addLine)', () => {
+    const s = useCartStore.getState();
+    s.addLine(line({ qty: 1 }));
+    s.placeOrder();
+    expect(useCartStore.getState().justPlaced).toBe(true);
+    useCartStore.getState().addLine(line({ qty: 1 }));
+    expect(useCartStore.getState().justPlaced).toBe(false);
+  });
+
+  it('is cleared by clearJustPlaced (on confirmation mount)', () => {
+    const s = useCartStore.getState();
+    s.addLine(line({ qty: 1 }));
+    s.placeOrder();
+    useCartStore.getState().clearJustPlaced();
+    expect(useCartStore.getState().justPlaced).toBe(false);
+  });
+
+  it('does not persist justPlaced to localStorage', () => {
+    const s = useCartStore.getState();
+    s.addLine(line({ qty: 1 }));
+    s.placeOrder();
+    const persisted = JSON.parse(localStorage.getItem('viki-cart') ?? '{}');
+    expect(persisted.state?.justPlaced).toBeUndefined();
+  });
+});

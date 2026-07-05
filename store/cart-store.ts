@@ -14,6 +14,12 @@ type CartState = {
   /** Id of the menu item whose customisation modal is open, or null. */
   modalItemId: string | null;
   lastOrder: Order | null;
+  /**
+   * Transient (not persisted) flag: true between placing an order and landing on
+   * the confirmation screen. Lets the checkout guard tell a just-placed empty cart
+   * (navigate to confirmation) from a stale empty cart (redirect to /menu).
+   */
+  justPlaced: boolean;
 
   setService: (service: Service) => void;
   addLine: (line: CartLine) => void;
@@ -25,6 +31,7 @@ type CartState = {
   openItem: (id: string) => void;
   closeItem: () => void;
   placeOrder: () => Order | null;
+  clearJustPlaced: () => void;
 
   count: () => number;
   totals: () => Totals;
@@ -43,21 +50,24 @@ export const useCartStore = create<CartState>()(
       cartOpen: false,
       modalItemId: null,
       lastOrder: null,
+      justPlaced: false,
 
       setService: (service) => set({ service }),
 
       addLine: (line) =>
         set((state) => {
+          // Adding to the cart starts a new order, so clear any just-placed flag.
           const existing = state.cart.find((l) => l.key === line.key);
           if (existing) {
             // Same customisation → merge quantities rather than duplicate.
             return {
+              justPlaced: false,
               cart: state.cart.map((l) =>
                 l.key === line.key ? { ...l, qty: l.qty + line.qty } : l,
               ),
             };
           }
-          return { cart: [...state.cart, line] };
+          return { justPlaced: false, cart: [...state.cart, line] };
         }),
 
       incLine: (key) =>
@@ -94,9 +104,11 @@ export const useCartStore = create<CartState>()(
           eta: etaFor(service),
           placedAt: Date.now(),
         };
-        set({ cart: [], cartOpen: false, lastOrder: order });
+        set({ cart: [], cartOpen: false, lastOrder: order, justPlaced: true });
         return order;
       },
+
+      clearJustPlaced: () => set({ justPlaced: false }),
 
       count: () => get().cart.reduce((sum, l) => sum + l.qty, 0),
       totals: () => totals(get().cart, get().service),

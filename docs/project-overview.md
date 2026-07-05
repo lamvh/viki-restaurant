@@ -39,5 +39,5 @@ directions 1a/1c, delivery geocoding / live ETA, admin.
 | 02 | Data & logic core (menu, pricing, store) | Complete |
 | 03 | Layout chrome + homepage | Complete |
 | 04 | Menu + item modal | Complete |
-| 05 | Cart drawer + checkout + confirmation | Pending |
+| 05 | Cart drawer + checkout + confirmation | Complete |
 | 06 | Component tests + docs + responsive QA | Pending |
