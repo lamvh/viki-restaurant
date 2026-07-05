@@ -11,6 +11,8 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | Cart drawer | Line qty controls, empty state, live totals | ⬜ |
 | Checkout | Details + payment + live order summary (pickup & delivery) | ⬜ |
 | Order confirmation | Success screen reading last order from store | ⬜ |
-| Pricing engine | Subtotal, ≥$30 discount, delivery fee, points, $5 min, ETA | ⬜ |
-| Cart persistence | Service + cart + last order via `localStorage` | ⬜ |
+| Pricing engine | Subtotal, ≥$30 discount, delivery fee, points, $5 min, ETA | ✅ |
+| Menu data | 6 categories, 27 items, option groups, featured lookup | ✅ |
+| Cart store | Zustand: add/inc/dec/remove, service, placeOrder | ✅ |
+| Cart persistence | Service + cart + last order via `localStorage` | ✅ |
 | Route guards | Empty-cart / no-order redirects | ⬜ |

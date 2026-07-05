@@ -30,7 +30,7 @@ directions 1a/1c, delivery geocoding / live ETA, admin.
 | Phase | Description | Status |
 |---|---|---|
 | 01 | Project scaffold & tooling | Complete |
-| 02 | Data & logic core (menu, pricing, store) | Pending |
+| 02 | Data & logic core (menu, pricing, store) | Complete |
 | 03 | Layout chrome + homepage | Pending |
 | 04 | Menu + item modal | Pending |
 | 05 | Cart drawer + checkout + confirmation | Pending |
