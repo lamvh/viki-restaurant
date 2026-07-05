@@ -1,7 +1,7 @@
 ---
 title: "Viki — Next.js Homepage & Ordering Flow"
 description: "Standalone Next.js 15 restaurant site: 1b Fresh homepage + full ordering flow"
-status: pending
+status: complete
 priority: P2
 effort: 24h
 branch: main

@@ -29,7 +29,7 @@ directions 1a/1c, delivery geocoding / live ETA, admin.
 
 | # | Milestone | Status |
 |---|---|---|
-| 1 | Homepage + full ordering flow ("1b Fresh") | In progress |
+| 1 | Homepage + full ordering flow ("1b Fresh") + SEO | Complete |
 
 ## Phase status
 

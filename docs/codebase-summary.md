@@ -30,5 +30,7 @@ viki-restaurant/
 
 ## Status
 
-Phase 01 (scaffold) complete: runnable app, tooling, tokens, fonts, test harness,
-docs skeletons. Feature code lands in Phases 02–06.
+All 7 phases complete: scaffold + tooling, data/pricing/store core, layout chrome +
+homepage, menu + item modal, cart drawer + checkout + confirmation, component tests +
+responsive QA, and SEO + structured data. 46 tests pass; lint/build clean. Milestone
+(homepage + full ordering flow, "1b Fresh", SEO-ready) done.
