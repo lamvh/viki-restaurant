@@ -32,7 +32,7 @@ export function MenuItemRow({ item }: { item: MenuItem }) {
           ) : null}
         </div>
       </div>
-      <ImageSlot label={item.name} className="h-20 w-20 shrink-0" />
+      <ImageSlot label={item.name} src={item.image} className="h-20 w-20 shrink-0" />
     </button>
   );
 }

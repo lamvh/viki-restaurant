@@ -83,7 +83,7 @@ function ItemModalPanel({ item }: { item: MenuItem }) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
-          <ImageSlot label={item.name} ratio="16 / 9" className="mb-4 w-full" />
+          <ImageSlot label={item.name} src={item.image} ratio="16 / 9" className="mb-4 w-full" />
 
           {(item.groups ?? []).map((group) => (
             <OptionGroup

@@ -25,6 +25,8 @@ export type MenuItem = {
   price: number;
   tags?: Tag[];
   groups?: OptionGroup[];
+  /** Dish photo under /public. Omitted → ImageSlot renders its placeholder. */
+  image?: string;
 };
 
 export type MenuCategory = {

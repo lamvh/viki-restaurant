@@ -50,6 +50,7 @@ export const riceAndNoodleMains: MenuCategory = {
       desc: 'Wok-tossed shaking beef, peppercorn-lime, rice.',
       price: 24,
       tags: ['GF', 'DF'],
+      image: '/dishes/shaking-beef.jpg',
     },
   ],
 };

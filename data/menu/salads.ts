@@ -10,6 +10,7 @@ export const salads: MenuCategory = {
       desc: 'Shredded cabbage, herbs, fried shallots, nước chấm dressing.',
       price: 17,
       tags: ['GF', 'DF'],
+      image: '/dishes/chicken-salad.jpg',
       groups: [
         {
           id: 'lcsalad-protein',

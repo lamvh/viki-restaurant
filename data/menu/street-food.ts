@@ -10,6 +10,7 @@ export const streetFood: MenuCategory = {
       desc: 'Fresh rice-paper rolls with prawn, pork & herbs, peanut hoisin.',
       price: 9.5,
       tags: ['GF', 'DF'],
+      image: '/dishes/summer-rolls.jpg',
       groups: [
         {
           id: 'goicuon-protein',
@@ -28,6 +29,7 @@ export const streetFood: MenuCategory = {
       desc: 'Crispy fried pork & taro spring rolls with nước chấm.',
       price: 10,
       tags: ['DF'],
+      image: '/dishes/springroll.jpg',
     },
     {
       id: 'banhxeo',

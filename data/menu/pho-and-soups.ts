@@ -10,6 +10,7 @@ export const phoAndSoups: MenuCategory = {
       desc: 'Beef noodle soup, 12-hour bone broth, rare beef & brisket.',
       price: 16,
       tags: ['GF', 'DF'],
+      image: '/dishes/pho-bo.jpg',
       groups: [
         {
           id: 'phobo-size',
@@ -38,6 +39,7 @@ export const phoAndSoups: MenuCategory = {
       desc: 'Chicken noodle soup, poached chicken, ginger broth.',
       price: 15,
       tags: ['GF', 'DF'],
+      image: '/dishes/pho-ga.jpg',
     },
     {
       id: 'phochay',

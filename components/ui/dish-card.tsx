@@ -11,7 +11,7 @@ import { Money } from './money';
 export function DishCard({ item }: { item: MenuItem }) {
   return (
     <article className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface">
-      <ImageSlot label={item.name} ratio="4 / 3" className="w-full" />
+      <ImageSlot label={item.name} src={item.image} ratio="4 / 3" className="w-full" />
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="text-lg leading-tight">{item.name}</h3>
