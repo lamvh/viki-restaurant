@@ -8,7 +8,7 @@ import { menuJsonLd } from '@/lib/structured-data';
 export const metadata: Metadata = {
   title: 'Menu',
   description:
-    'Browse the Viki menu — phở, bánh mì, salads, rice & noodle mains. Order pickup or delivery.',
+    'Browse the Viki menu — charcoal-grilled signatures, phở, and Vietnamese street-food mains. Order pickup or delivery.',
   alternates: { canonical: '/menu' },
 };
 

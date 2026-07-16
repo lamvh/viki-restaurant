@@ -1,8 +1,43 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ItemModal } from './item-modal';
 import { useCartStore } from '@/store/cart-store';
+
+// The modal's option/price engine is exercised against a controlled fixture with
+// option groups, so this test stays independent of the live menu (whose real
+// dishes carry no add-on options).
+vi.mock('@/data/menu', () => ({
+  findItem: (id: string) =>
+    id === 'phobo'
+      ? {
+          id: 'phobo',
+          name: 'Phở Bò',
+          desc: 'Fixture item for option-engine tests.',
+          price: 16,
+          groups: [
+            {
+              id: 'phobo-size',
+              title: 'Size',
+              type: 'single',
+              choices: [
+                { id: 'regular', label: 'Regular', price: 0 },
+                { id: 'large', label: 'Large', price: 3 },
+              ],
+            },
+            {
+              id: 'phobo-addons',
+              title: 'Add-ons',
+              type: 'multi',
+              choices: [
+                { id: 'brisket', label: 'Extra brisket', price: 4 },
+                { id: 'noodles', label: 'Extra noodles', price: 2 },
+              ],
+            },
+          ],
+        }
+      : undefined,
+}));
 
 function reset() {
   localStorage.clear();

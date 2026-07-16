@@ -2,27 +2,17 @@
 // this module composes them and exposes lookup + featured helpers.
 
 import type { MenuCategory, MenuItem } from '@/types/menu';
-import { streetFood } from './menu/street-food';
-import { salads } from './menu/salads';
-import { phoAndSoups } from './menu/pho-and-soups';
-import { riceAndNoodleMains } from './menu/rice-and-noodle-mains';
-import { banhMi } from './menu/banh-mi';
-import { drinksAndDessert } from './menu/drinks-and-dessert';
+import { appetizers } from './menu/appetizers';
+import { mains } from './menu/mains';
+import { charcoalSignature } from './menu/charcoal-signature';
 
-export const MENU: MenuCategory[] = [
-  streetFood,
-  salads,
-  phoAndSoups,
-  riceAndNoodleMains,
-  banhMi,
-  drinksAndDessert,
-];
+export const MENU: MenuCategory[] = [appetizers, mains, charcoalSignature];
 
 /** Flattened list of every item across all categories. */
 export const ALL_ITEMS: MenuItem[] = MENU.flatMap((category) => category.items);
 
-/** "Popular right now" item ids (design spec §5). */
-export const FEATURED_IDS = ['phobo', 'lcsalad', 'porkbm'] as const;
+/** "Popular right now" item ids — all photographed, visually strong. */
+export const FEATURED_IDS = ['phobo', 'porkbellyvermicelli', 'firephoenix'] as const;
 
 export function findItem(id: string): MenuItem | undefined {
   return ALL_ITEMS.find((item) => item.id === id);
