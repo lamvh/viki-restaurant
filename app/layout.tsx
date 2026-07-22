@@ -1,11 +1,6 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, Hanken_Grotesk } from 'next/font/google';
 import './globals.css';
-import { PromoBar } from '@/components/layout/promo-bar';
-import { SiteHeader } from '@/components/layout/site-header';
-import { SiteFooter } from '@/components/layout/site-footer';
-import { ItemModal } from '@/components/menu/item-modal';
-import { CartDrawer } from '@/components/cart/cart-drawer';
 import { SITE_URL, SITE_NAME, SITE_LOCALE } from '@/lib/site';
 
 // Self-hosted Google fonts exposed as CSS variables consumed by globals.css.
@@ -68,14 +63,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${instrumentSerif.variable} ${hankenGrotesk.variable}`}>
-      <body>
-        <PromoBar />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
-        <ItemModal />
-        <CartDrawer />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
