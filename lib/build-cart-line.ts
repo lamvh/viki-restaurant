@@ -59,6 +59,11 @@ export function buildCartLine(
     qty,
     labels: lineLabels(item, selections),
     notes: notes.trim(),
+    // Carried so the server can reprice this line from the menu. `labels` are
+    // display text and `key` embeds free-text notes, so neither round-trips.
+    choiceIds: chosenChoices(item, selections)
+      .map((c) => c.choiceId)
+      .sort(),
   };
 }
 

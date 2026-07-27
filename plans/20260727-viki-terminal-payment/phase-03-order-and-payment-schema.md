@@ -8,7 +8,7 @@
 
 ## Overview
 - **Priority:** P1 (blocks everything)
-- **Status:** pending
+- **Status:** ✅ done
 - **Description:** Migration `0005` extends `orders` with identity and payment columns for **both** channels, adds `payment_events`, widens the status constraint, and drops the anon-insert RLS hole. Schema only — no runtime behaviour changes.
 
 ## Key Insights
@@ -137,11 +137,11 @@ drop policy if exists "order_items_anon_insert" on order_items;
 5. Confirm in Supabase → Auth → Policies that `orders_anon_insert` is gone, then attempt an insert into `orders` using the **anon** key and confirm it is rejected by policy.
 
 ## Todo List
-- [ ] `0005_payments.sql` written
-- [ ] Migration applied to Supabase
-- [ ] `npm run db:types` regenerated; new columns + `payment_events` present
-- [ ] `orders_anon_insert` confirmed gone, anon insert rejected
-- [ ] `lint` / `build` green
+- [x] `0005_payments.sql` written
+- [x] Migration applied to Supabase (project `viki`, only 0005 pending → applied)
+- [x] Types regenerated; all 9 new columns + `payment_events` present
+- [x] Anon insert rejected (42501 RLS violation); anon reads of `orders` + `payment_events` return 0 rows against a seeded row
+- [x] `tsc` / `lint` / 96 tests green
 
 ## Success Criteria
 1. `orders` carries the identity, payment, HIT, and online columns.

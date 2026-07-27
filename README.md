@@ -47,6 +47,8 @@ Living docs are maintained under [`docs/`](./docs):
 - [`features.md`](./docs/features.md) — feature list with status
 - [`design-guidelines.md`](./docs/design-guidelines.md) — tokens, typography, the 1b direction
 - [`seo-guidelines.md`](./docs/seo-guidelines.md) — SEO meta, Open Graph, JSON-LD conventions
+- [`windcave-integration.md`](./docs/windcave-integration.md) — payment account, endpoints, verified protocol facts
+- [`terminal-payment-uat-runbook.md`](./docs/terminal-payment-uat-runbook.md) — manual card-terminal test script
 - [`changelog.md`](./docs/changelog.md) — dated record of changes
 
 The design spec lives at

@@ -3,7 +3,7 @@ import { totals, etaFor } from '@/lib/pricing';
 import type { CartLine } from '@/types/cart';
 
 function line(unit: number, qty = 1, key = `k${unit}-${qty}`): CartLine {
-  return { key, id: 'x', name: 'X', unit, qty, labels: [], notes: '' };
+  return { key, id: 'x', name: 'X', unit, qty, labels: [], notes: '', choiceIds: [] };
 }
 
 describe('totals', () => {

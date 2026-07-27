@@ -13,7 +13,7 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:types": "supabase gen types typescript --linked > types/supabase.ts",
+    "db:types": "npx supabase gen types typescript --linked > types/supabase.ts",
     "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {

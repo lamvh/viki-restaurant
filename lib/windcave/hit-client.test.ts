@@ -28,6 +28,7 @@ beforeEach(() => {
   vi.stubEnv('WINDCAVE_HIT_KEY', KEY);
   vi.stubEnv('WINDCAVE_HIT_STATION', '3425240086');
   vi.stubEnv('WINDCAVE_HIT_POS_NAME', 'Viki');
+  vi.stubEnv('WINDCAVE_HIT_VENDOR_ID', 'VND123');
 });
 
 afterEach(() => {
@@ -142,5 +143,16 @@ describe('errors', () => {
     mockFetch(OK_BODY);
 
     await expect(pollStatus('VK-1')).rejects.toThrow(/WINDCAVE_HIT_KEY/);
+  });
+
+  it('refuses to send without a VendorId rather than falling back to a placeholder', async () => {
+    // Windcave assigns this. A default would pass UAT and be rejected in
+    // production — the worst possible moment to discover it.
+    vi.stubEnv('WINDCAVE_HIT_VENDOR_ID', '');
+    mockFetch(OK_BODY);
+
+    await expect(
+      startPurchase({ amount: '1.00', currency: 'NZD', txnRef: 'VK-1' }),
+    ).rejects.toThrow(/WINDCAVE_HIT_VENDOR_ID/);
   });
 });

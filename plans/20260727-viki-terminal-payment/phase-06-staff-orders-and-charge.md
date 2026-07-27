@@ -8,7 +8,7 @@
 
 ## Overview
 - **Priority:** P1
-- **Status:** pending
+- **Status:** ✅ done
 - **Description:** Gives staff somewhere to work from. A minimal `/admin/orders` list of today's orders with a **Take card payment** action that allocates a `TxnRef`, persists it, and starts the terminal purchase.
 
 ## Key Insights
@@ -243,14 +243,14 @@ export async function markOrderPaidCash(orderId: string) {
 9. `npm run lint`, `npm run build`.
 
 ## Todo List
-- [ ] `lib/db/list-orders.ts` with `requireStaff()`
-- [ ] `terminal-payment.ts` — ref persisted before POST, conditional-update claim
-- [ ] `settleOrderAsCash` with conditional update
-- [ ] `app/admin/orders/actions.ts` — both actions with their own `requireStaff()`
-- [ ] `/admin/orders` page + `order-row.tsx` with Take card payment **and** Mark paid (cash)
-- [ ] Orders link in the admin nav
-- [ ] Verified ref is written before the POST and increments on retry
-- [ ] `lint` / `build` green
+- [x] `lib/db/list-orders.ts` with `requireStaff()`
+- [x] `terminal-payment.ts` — ref persisted before POST, conditional-update claim
+- [x] `settleOrderAsCash` with conditional update
+- [x] `app/admin/orders/actions.ts` — both actions with their own `requireStaff()`
+- [x] `/admin/orders` page + `order-row.tsx` with Take card payment **and** Mark paid (cash)
+- [x] Orders link in the admin nav
+- [x] Verified ref is written before the POST and increments on retry
+- [x] `tsc` / `lint` green · [ ] `npm run build` not run (dev server shares `.next`)
 
 ## Success Criteria
 1. Staff see recent orders with reference, total, and payment status.

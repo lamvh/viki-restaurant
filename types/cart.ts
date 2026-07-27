@@ -13,15 +13,32 @@ export type CartLine = {
   /** Human-readable selected option labels shown under the line. */
   labels: string[];
   notes: string;
+  /**
+   * Selected option choice ids. The trusted basis for server-side repricing —
+   * `labels` are display text and `key` embeds free-text notes, so neither can
+   * be parsed back reliably.
+   */
+  choiceIds: string[];
 };
 
-export type Order = {
-  /** Mock order number, e.g. "VK-4821". */
-  number: string;
-  total: number;
-  points: number;
+/**
+ * Untrusted wire shape sent to the server at checkout. Prices are deliberately
+ * absent: the server rebuilds every unit price from the menu.
+ */
+export type CheckoutLineInput = {
+  itemId: string;
+  choiceIds: string[];
+  qty: number;
+  notes: string;
+};
+
+export type CheckoutPayload = {
   service: Service;
-  eta: string;
-  /** Epoch ms when the order was placed. */
-  placedAt: number;
+  lines: CheckoutLineInput[];
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+  /** `cash` = pay on collection. `card` is the online channel, not yet enabled. */
+  paymentMethod: 'card' | 'cash';
 };

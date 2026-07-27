@@ -8,7 +8,7 @@
 
 ## Overview
 - **Priority:** P1 (the correctness core of the milestone)
-- **Status:** pending
+- **Status:** ✅ done
 - **Description:** The polling loop. A staff-guarded route relays Status requests to the terminal; the UI renders the terminal's own `DL1`/`DL2` prompts and `B1`/`B2` buttons until `Complete=1`, then finalises the order. Plus recovery for a sale interrupted by a closed browser.
 
 ## Key Insights
@@ -213,14 +213,14 @@ export async function GET(request: NextRequest) {
 6. `npm test`, `npm run lint`, `npm run build`.
 
 ## Todo List
-- [ ] `pollTerminalPayment` + idempotent `finaliseTerminalPayment`
-- [ ] Staff-guarded `/api/admin/terminal/status` route (401 without session)
-- [ ] Polling dialog rendering DL1/DL2 verbatim + B1/B2 buttons
-- [ ] Bounded polling (~2 min) then Resume
-- [ ] Resume path for orders stuck `pending` with a ref
-- [ ] Mismatch state worded as needs-review, never success
-- [ ] `terminal-payment.test.ts` covering all eight cases
-- [ ] `test` / `lint` / `build` green
+- [x] `pollTerminalPayment` + idempotent `finaliseTerminalPayment`
+- [x] Staff-guarded `/api/admin/terminal/status` route (401 without session)
+- [x] Polling dialog rendering DL1/DL2 verbatim + B1/B2 buttons
+- [x] Bounded polling (~2 min) then Resume
+- [x] Resume path for orders stuck `pending` with a ref
+- [x] Mismatch state worded as needs-review, never success
+- [x] `terminal-payment.test.ts` covering all eight cases
+- [x] `tsc` / `lint` / 112 tests green · [ ] `npm run build` not run (dev server shares `.next`)
 
 ## Success Criteria
 1. A live sale shows the terminal's own prompts changing in step with the device.

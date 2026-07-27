@@ -233,6 +233,8 @@ work will help.
 | `WINDCAVE_HIT_KEY` | *(secret — rotate first)* |
 | `WINDCAVE_HIT_STATION` | `3425240086` |
 | `WINDCAVE_HIT_POS_NAME` | `Viki` |
+| `WINDCAVE_HIT_POS_VERSION` | `1.0` |
+| `WINDCAVE_HIT_VENDOR_ID` | **Required.** Assigned by Windcave — set in `.env.local`, no code default |
 
 ### Flow
 
@@ -260,6 +262,7 @@ evidence:
 | `B1`/`B2` | Elements with an `en` attribute (`1` = enabled); the label is the text content |
 | Result fields | Two-letter codes: `AP` (1/0 approved), `AC`, `RC`, `RT`, `TR`, `CN`, `CT` |
 | Result amounts | `AmtA`, `AmtS`, `AmtT` are **integer cents**, not `D.CC` strings |
+| Printing | The CHU200TP **has a thermal printer** and prints its own card receipt, but **HIT cannot send arbitrary content to it**. `TxnType=Receipt` only *retrieves* the EFTPOS receipt text (`Rcpt`, width `RcptW`) for the POS to print. An itemised food bill therefore prints from the POS, not the device |
 | Cancelling | **No `Cancel` TxnType exists.** A sale can be stopped from the POS only while the terminal offers a button (`Val=CANCEL`); otherwise it must be cancelled on the device |
 | `PJ` | "TxnRef not matched" — the transaction was never registered, usually because the Purchase itself was rejected |
 
@@ -276,7 +279,7 @@ evidence:
 |---|---|
 | `/admin/orders` | Staff order list; start a charge or settle as cash |
 | `/api/admin/terminal/status` | Staff-guarded poll relay — the browser never talks to Windcave |
-| `/admin/terminal-test` | **Temporary** connection spike; removed once the real flow lands |
+| `/order/[token]` | Customer confirmation, `noindex` |
 
 ---
 

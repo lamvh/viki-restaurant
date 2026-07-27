@@ -8,7 +8,7 @@
 
 ## Overview
 - **Priority:** P1
-- **Status:** pending
+- **Status:** ✅ done
 - **Description:** The missing server-side order path. A server action validates the checkout payload, **recomputes every price from trusted menu data**, and persists `orders` + `order_items` via the service-role client. Ships the **cash branch end to end** — a complete, working, independently valuable order flow with no gateway involved.
 
 ## Key Insights
@@ -333,14 +333,14 @@ is reduced accordingly in Phase 03.
 10. Run `npm test`, `npm run lint`, `npm run build`.
 
 ## Todo List
-- [ ] `types/cart.ts` extended with `choiceIds`, `CheckoutLineInput`, `CheckoutPayload`
-- [ ] `buildCartLine` populates `choiceIds`
-- [ ] Cart persist `version: 1` + migrate drops v0 carts
-- [ ] `lib/orders/reference.ts` + tests green
-- [ ] `lib/orders/rebuild-cart.ts` + tests green
-- [ ] `lib/orders/create-order.ts` (service-role, rollback on item insert failure)
-- [ ] `app/(site)/checkout/actions.ts` with cash branch
-- [ ] `npm test` / `lint` / `build` green
+- [x] `types/cart.ts` extended with `choiceIds`, `CheckoutLineInput`, `CheckoutPayload`
+- [x] `buildCartLine` populates `choiceIds`
+- [x] Cart persist `version: 1` + migrate drops v0 carts
+- [x] `lib/orders/reference.ts` + 5 tests green
+- [x] `lib/orders/rebuild-cart.ts` + 10 tests green (mocked menu covers option-group rules)
+- [x] `lib/orders/create-order.ts` (service-role, rollback on item insert failure)
+- [x] `app/(site)/checkout/actions.ts` with pay-on-collection branch
+- [x] `tsc` / `lint` / 111 tests green; insert shape verified against the live schema
 
 ## Success Criteria
 1. A cash order inserts one `orders` row and matching `order_items`, then redirects to `/order/{public_token}` (page arrives in Phase 06 — verify the row and the redirect target for now).

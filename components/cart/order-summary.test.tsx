@@ -5,7 +5,7 @@ import { useCartStore } from '@/store/cart-store';
 import type { CartLine } from '@/types/cart';
 
 function line(unit: number, qty = 1, key = `k${unit}`): CartLine {
-  return { key, id: 'x', name: 'X', unit, qty, labels: [], notes: '' };
+  return { key, id: 'x', name: 'X', unit, qty, labels: [], notes: '', choiceIds: [] };
 }
 
 function setup(cart: CartLine[], service: 'pickup' | 'delivery' = 'pickup') {
@@ -15,8 +15,6 @@ function setup(cart: CartLine[], service: 'pickup' | 'delivery' = 'pickup') {
     cart,
     cartOpen: false,
     modalItemId: null,
-    lastOrder: null,
-    justPlaced: false,
   });
 }
 

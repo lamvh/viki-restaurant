@@ -15,9 +15,10 @@ export type HitEnv = {
   /** POS software version reported to Windcave. */
   posVersion: string;
   /**
-   * Vendor identifier. **Required** — the service rejects a Purchase without it
-   * ("Missing tag VendorID"). Windcave assigns this during POS certification;
-   * until then a plain identifier is accepted in UAT.
+   * Vendor identifier assigned by Windcave. **Required** — the service rejects a
+   * Purchase without it ("Missing tag VendorID"). Deliberately has no default:
+   * a placeholder would be accepted in UAT and rejected in production, which is
+   * the worst possible time to find out.
    */
   vendorId: string;
   currency: string;
@@ -42,7 +43,7 @@ export function hitEnv(): HitEnv {
     posName: process.env.WINDCAVE_HIT_POS_NAME ?? 'Viki',
     deviceId: process.env.WINDCAVE_HIT_DEVICE_ID ?? process.env.WINDCAVE_HIT_POS_NAME ?? 'Viki',
     posVersion: process.env.WINDCAVE_HIT_POS_VERSION ?? '1.0',
-    vendorId: process.env.WINDCAVE_HIT_VENDOR_ID || 'Viki',
+    vendorId: required('WINDCAVE_HIT_VENDOR_ID'),
     currency: process.env.WINDCAVE_CURRENCY ?? 'NZD',
   });
 }

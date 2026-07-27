@@ -1,27 +1,28 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCartStore } from '@/store/cart-store';
+import { useState, useTransition } from 'react';
+
+import { submitCheckout } from '@/app/(site)/checkout/actions';
 import { totals } from '@/lib/pricing';
-import { PaymentMethods, type PaymentMethod } from './payment-methods';
+import { useCartStore } from '@/store/cart-store';
+import type { CheckoutLineInput } from '@/types/cart';
 
 type Errors = Partial<Record<'name' | 'phone' | 'email' | 'address', string>>;
 
-/** Checkout details + payment form. Places a (mock) order on valid submit. */
-export function CheckoutForm() {
-  const router = useRouter();
+/** Checkout details form. Submits to the server, which prices and persists the order. */
+export function CheckoutForm({ cardEnabled }: { cardEnabled: boolean }) {
   const service = useCartStore((s) => s.service);
   const cart = useCartStore((s) => s.cart);
-  const placeOrder = useCartStore((s) => s.placeOrder);
   const t = totals(cart, service);
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
-  const [payment, setPayment] = useState<PaymentMethod>('card');
+  const [payment, setPayment] = useState<'card' | 'cash'>(cardEnabled ? 'card' : 'cash');
   const [errors, setErrors] = useState<Errors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
   function validate(): Errors {
     const e: Errors = {};
@@ -37,14 +38,45 @@ export function CheckoutForm() {
   function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (t.belowDeliveryMin || cart.length === 0) return;
+
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length > 0) return;
-    const order = placeOrder();
-    if (order) router.push('/order/confirmed');
+
+    // Prices are deliberately absent — the server rebuilds every line from the
+    // menu, so anything sent here about cost would be ignored anyway.
+    const lines: CheckoutLineInput[] = cart.map((line) => ({
+      itemId: line.id,
+      choiceIds: line.choiceIds,
+      qty: line.qty,
+      notes: line.notes,
+    }));
+
+    setFormError(null);
+    startTransition(async () => {
+      // On success the action redirects; only failures return here. The cart is
+      // deliberately left intact — it is cleared on the confirmation page.
+      const result = await submitCheckout({
+        service,
+        lines,
+        name,
+        phone,
+        email,
+        address,
+        paymentMethod: cardEnabled ? payment : 'cash',
+      });
+
+      if ('error' in result) {
+        setFormError(result.error);
+        return;
+      }
+
+      // The hosted payment page is cross-origin, so router.push cannot reach it.
+      if ('redirectUrl' in result) window.location.href = result.redirectUrl;
+    });
   }
 
-  const blocked = cart.length === 0 || t.belowDeliveryMin;
+  const blocked = cart.length === 0 || t.belowDeliveryMin || pending;
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
@@ -55,11 +87,55 @@ export function CheckoutForm() {
         <Field id="address" label="Delivery address" value={address} onChange={setAddress} error={errors.address} autoComplete="street-address" />
       ) : null}
 
-      <PaymentMethods value={payment} onChange={setPayment} />
+      {cardEnabled ? (
+        <fieldset>
+          <legend className="mb-2 text-sm font-semibold">Payment</legend>
+          <div className="grid gap-2">
+            {(
+              [
+                ['card', 'Pay now by card', 'Secure payment page — Visa, Mastercard, wallets'],
+                ['cash', 'Pay on collection', 'Cash or card on our terminal when you arrive'],
+              ] as const
+            ).map(([value, label, hint]) => (
+              <label
+                key={value}
+                className={`flex cursor-pointer items-start gap-3 rounded-[var(--radius-btn)] border p-3 ${
+                  payment === value ? 'border-brand' : 'border-line'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  checked={payment === value}
+                  onChange={() => setPayment(value)}
+                  className="mt-1 accent-[var(--color-brand)]"
+                />
+                <span>
+                  <span className="block text-sm font-medium">{label}</span>
+                  <span className="block text-xs text-muted">{hint}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : (
+        <div className="rounded-[var(--radius-btn)] border border-line p-3">
+          <p className="text-sm font-semibold">Payment</p>
+          <p className="mt-1 text-xs text-muted">
+            Pay when you collect — cash, or card on our terminal.
+          </p>
+        </div>
+      )}
 
       {t.belowDeliveryMin ? (
         <p className="text-sm font-medium text-brand">
           Your order is below the delivery minimum — add more or switch to pickup.
+        </p>
+      ) : null}
+
+      {formError ? (
+        <p role="alert" className="text-sm font-medium text-brand">
+          {formError}
         </p>
       ) : null}
 
@@ -68,7 +144,13 @@ export function CheckoutForm() {
         disabled={blocked}
         className="rounded-[var(--radius-btn)] bg-brand px-4 py-3 text-sm font-semibold text-surface disabled:opacity-50"
       >
-        Place order
+        {pending
+          ? cardEnabled && payment === 'card'
+            ? 'Redirecting to payment…'
+            : 'Placing order…'
+          : cardEnabled && payment === 'card'
+            ? 'Pay now'
+            : 'Place order'}
       </button>
     </form>
   );

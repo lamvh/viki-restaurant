@@ -89,3 +89,56 @@ Every subsequent staff account is created the same way and promoted (or left as
 Create a public-read bucket named `dish-images` (Storage → New bucket → Public).
 Phase 6 uploads new dish photos here via a server action using the service-role
 client; type is restricted to jpeg/png/webp, max ~5 MB.
+
+## Payment — terminal (Windcave HIT)
+
+Full account details, verified protocol facts and the credential map live in
+[`windcave-integration.md`](./windcave-integration.md). Manual test script:
+[`terminal-payment-uat-runbook.md`](./terminal-payment-uat-runbook.md).
+
+### Environment variables
+
+```
+WINDCAVE_HIT_URL=https://uat.windcave.com/hit/pos.aspx
+WINDCAVE_HIT_USER=VinapageUAT_HIT
+WINDCAVE_HIT_KEY=            # server-only, never NEXT_PUBLIC_
+WINDCAVE_HIT_STATION=3425240086
+WINDCAVE_HIT_POS_NAME=Viki
+WINDCAVE_HIT_POS_VERSION=1.0
+WINDCAVE_HIT_VENDOR_ID=Viki  # required by the service; Windcave assigns the real one
+WINDCAVE_CURRENCY=NZD
+```
+
+### Admin sign-in
+
+The admin panel accepts a password login that needs no Supabase user. It is
+**disabled in production unless `ADMIN_LOGIN_PASSWORD` is set**, so a deployment
+can never ship with the `admin`/`admin` development default.
+
+```
+ADMIN_LOGIN_USER=admin
+ADMIN_LOGIN_PASSWORD=        # required in production; use a strong value
+ADMIN_SESSION_SECRET=        # HMAC key; falls back to SUPABASE_SERVICE_ROLE_KEY
+```
+
+Generate a secret with `openssl rand -base64 32`.
+
+### Terminal network requirement
+
+The reader talks to Windcave over **TCP port 65** (`uatscr.windcave.com` for UAT,
+`scr.windcave.com` for production). If that port is blocked the terminal never
+comes online, and the symptom is indistinguishable from a broken integration —
+check connectivity on the device before debugging the app.
+
+### Migrations
+
+`0005_payments.sql` adds order identity tokens, payment state, terminal and
+gateway columns, and the `payment_events` audit table. It also **drops the
+`orders_anon_insert` RLS policy**, which allowed anyone holding the public anon
+key to forge an order at any total.
+
+### Before production
+
+**Windcave requires POS certification for the card-present channel.** It is an
+external turnaround and gates go-live regardless of how finished the code is.
+Book it early. The online channel needs a separate eCom certification.

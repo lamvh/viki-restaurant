@@ -2,6 +2,40 @@
 
 All notable changes to this project are recorded here, newest first.
 
+## 2026-07-27
+
+- **Terminal payment (Windcave HIT):** Card-present payment on the physical
+  CHU200TP reader. `lib/windcave/hit-*` speaks the XML protocol (envelope verified
+  against the live UAT terminal — see `windcave-integration.md`); staff charge an
+  order from `/admin/orders`, the browser polls a staff-guarded relay so the HIT
+  key never leaves the server, and the dialog mirrors the terminal's own `DL1`/`DL2`
+  prompts and `B1`/`B2` buttons. `TxnRef` is persisted **before** the terminal
+  request so a sale interrupted by a closed browser stays recoverable. Cancelling
+  works only while the terminal offers a button — HIT has no POS-initiated cancel.
+- **Counter till (`/admin/pos`):** staff ring up walk-in customers on a menu grid
+  and take payment on the terminal or in cash. This reverses an earlier scope
+  decision that only charged pre-existing online orders — backwards for a counter
+  reader. Counter sales go through the same `createOrder` path as online ones.
+- **Server-side orders:** Checkout is no longer a mock. `submitCheckout` rebuilds
+  every cart line from the menu and re-totals through `lib/pricing`, so the client
+  cannot influence what is charged; orders and items persist via the service-role
+  client. Confirmation moved from `localStorage` to a server-rendered
+  `/order/[token]`, so it survives a new device or a shared link.
+- **Cart lifecycle fix:** the cart now clears on the confirmation page, not at
+  submit. The old mock cleared optimistically — harmless for a fake order, hostile
+  for a real failed payment.
+- **Security:** dropped the `orders_anon_insert` RLS policy, which let anyone
+  holding the public anon key forge an order at any total. Verified: anon insert is
+  refused (42501), and anon reads of `orders` / `payment_events` return zero rows
+  against a seeded row.
+- **Admin password login:** sign-in that needs no Supabase user, HMAC-signed
+  session cookie. Disabled in production unless `ADMIN_LOGIN_PASSWORD` is set, so
+  no deployment can ship with guessable defaults. Also fixed the admin layout
+  blanking `/admin/login` — the login page was unreachable.
+- **Schema:** migration `0005_payments.sql` (order identity tokens, payment state,
+  HIT + online gateway columns, `payment_events` audit trail).
+- Docs: `windcave-integration.md`, `terminal-payment-uat-runbook.md`.
+
 ## 2026-07-05
 
 - **SEO & structured data:** Implemented per `seo-guidelines.md`. Global metadata

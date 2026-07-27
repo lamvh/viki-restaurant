@@ -1,5 +1,5 @@
 import { requireStaff } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server-client';
+import { createServiceClient } from '@/lib/supabase/service-client';
 
 export type OrderStatus = 'new' | 'preparing' | 'ready' | 'completed' | 'cancelled';
 
@@ -40,11 +40,20 @@ function startOfToday(): string {
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   await requireStaff();
 
-  const supabase = await createClient();
+  // Reads go through the service-role client, not the RLS-bound one.
+  //
+  // Authorisation is enforced above by `requireStaff()`. The RLS policy on
+  // `orders` requires `auth.role() = 'authenticated'`, which only holds for a
+  // Supabase Auth session — the admin password login (lib/auth/admin-session.ts)
+  // is not one, so an RLS-bound read silently returns zero rows for a perfectly
+  // valid staff user.
+  const supabase = createServiceClient();
 
   const { data, error } = await supabase
     .from('orders')
     .select('id, service, total, status, created_at')
+    // Orders still awaiting payment are not real work and not real revenue.
+    .neq('status', 'pending_payment')
     .order('created_at', { ascending: false })
     .limit(50);
 
@@ -53,7 +62,9 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   const since = startOfToday();
   const today = data.filter((o) => o.created_at >= since);
   const todayRevenue = today.reduce((sum, o) => sum + Number(o.total), 0);
-  const openCount = data.filter((o) => o.status === 'new' || o.status === 'preparing').length;
+  const openCount = data.filter(
+    (o) => o.status === 'new' || o.status === 'preparing',
+  ).length;
 
   return {
     todayCount: today.length,

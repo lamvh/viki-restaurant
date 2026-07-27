@@ -8,7 +8,7 @@
 
 ## Overview
 - **Priority:** P1
-- **Status:** pending
+- **Status:** ✅ done
 - **Description:** Replaces the `localStorage` confirmation with a server-rendered page backed by the database, rewires `CheckoutForm` onto the server action, fixes the cart lifecycle so a declined card keeps the cart, adds retry, and stops unpaid orders reaching the kitchen dashboard.
 
 ## Key Insights
@@ -238,17 +238,17 @@ export default async function OrderPage({ params }: { params: Promise<{ token: s
 11. `npm test`, `npm run lint`, `npm run build`.
 
 ## Todo List
-- [ ] `get-order-by-token.ts`
-- [ ] `retryPayment` action
-- [ ] `clear-cart-on-success.tsx`
-- [ ] `order-status-view.tsx` with all three states
-- [ ] `/order/[token]/page.tsx`, noindex + force-dynamic
-- [ ] `checkout-form.tsx` on the server action, cross-origin redirect
-- [ ] `cart-store.ts` mock order API removed
-- [ ] Old `/order/confirmed` route + view deleted, all references cleared
-- [ ] Dashboard excludes `pending_payment`
-- [ ] Tests updated; cart-survives-submit test added
-- [ ] `test` / `lint` / `build` green
+- [x] `get-order-by-token.ts`
+- [~] `retryPayment` — deferred with the online milestone (card-only concern)
+- [x] `clear-cart-on-success.tsx`
+- [x] `order-status-view.tsx` — confirmed / settling / failed
+- [x] `/order/[token]/page.tsx`, noindex + force-dynamic — verified in rendered HTML
+- [x] `checkout-form.tsx` on the server action
+- [x] `cart-store.ts` mock order API removed (placeOrder / lastOrder / justPlaced)
+- [x] Old `/order/confirmed` route + view + payment-methods deleted, all references cleared
+- [x] Dashboard excludes `pending_payment`
+- [x] Tests updated; cart-stays-intact test added
+- [x] `tsc` / `lint` / 105 tests green; confirmation page verified end-to-end against the dev server
 
 ## Success Criteria
 1. A paid card order shows its reference, items, and total read from the database — verified by clearing `localStorage` and reloading.

@@ -1,7 +1,7 @@
 ---
 title: "Viki — Terminal Payment (Windcave HIT)"
 description: "Shared server-side order path + Windcave HIT: staff charge existing orders on the physical CHU200TP card terminal"
-status: pending
+status: code_complete_pending_uat
 priority: P1
 effort: 40h
 branch: main
@@ -50,12 +50,12 @@ terminal respond?** Nothing else is built until that is proven. Flow comes after
 |---|---|---|---|---|
 | 01 | [HIT XML client](./phase-01-hit-xml-client.md) | 5h | ✅ done | — |
 | 02 | [**Terminal connection spike**](./phase-02-terminal-connection-spike.md) | 4h | ✅ done | 01 |
-| 03 | [Order + payment schema](./phase-03-order-and-payment-schema.md) | 5h | ⬜ pending | 02 |
-| 04 | [Server-side order creation](./phase-04-server-side-order-creation.md) | 6h | ⬜ pending | 03 |
-| 05 | [Confirmation page + checkout rewiring](./phase-05-confirmation-and-checkout-rewiring.md) | 4h | ⬜ pending | 04 |
-| 06 | [Staff order list + charge](./phase-06-staff-orders-and-charge.md) | 5h | ⬜ pending | 05 |
-| 07 | [Terminal polling on orders + recovery](./phase-07-terminal-polling-and-recovery.md) | 6h | ⬜ pending | 06 |
-| 08 | [Tests, UAT + docs](./phase-08-tests-uat-and-docs.md) | 5h | ⬜ pending | 01–07 |
+| 03 | [Order + payment schema](./phase-03-order-and-payment-schema.md) | 5h | ✅ done | 02 |
+| 04 | [Server-side order creation](./phase-04-server-side-order-creation.md) | 6h | ✅ done | 03 |
+| 05 | [Confirmation page + checkout rewiring](./phase-05-confirmation-and-checkout-rewiring.md) | 4h | ✅ done | 04 |
+| 06 | [Staff order list + charge](./phase-06-staff-orders-and-charge.md) | 5h | ✅ done | 05 |
+| 07 | [Terminal polling on orders + recovery](./phase-07-terminal-polling-and-recovery.md) | 6h | ✅ done | 06 |
+| 08 | [Tests, UAT + docs](./phase-08-tests-uat-and-docs.md) | 5h | 🚧 code done · UAT pending | 01–07 |
 
 **Total effort:** 40h — of which the **first 9h reaches a working terminal charge.**
 

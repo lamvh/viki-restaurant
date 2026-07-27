@@ -10,13 +10,21 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | Menu page | Sticky category chips (scrollspy) + item rows | ✅ |
 | Item modal | Option groups, qty, special instructions; live price | ✅ |
 | Cart drawer | Line qty controls, empty state, live totals, focus-trapped | ✅ |
-| Checkout | Details + payment + live order summary (pickup & delivery) | ✅ |
-| Order confirmation | Success screen reading last order from store | ✅ |
+| Checkout | Details + live order summary; submits to the server | ✅ |
+| Order confirmation | Server-rendered `/order/[token]`, read from the database | ✅ |
 | Pricing engine | Subtotal, ≥$30 discount, delivery fee, points, $5 min, ETA | ✅ |
 | Menu data | 6 categories, 27 items, option groups, featured lookup | ✅ |
-| Cart store | Zustand: add/inc/dec/remove, service, placeOrder | ✅ |
-| Cart persistence | Service + cart + last order via `localStorage` | ✅ |
-| Route guards | Empty-cart / no-order redirects (hydration-safe) | ✅ |
+| Cart store | Zustand: add/inc/dec/remove, service (order placement is server-side) | ✅ |
+| Cart persistence | Service + cart via `localStorage` (v1: cleared on confirmation) | ✅ |
+| Route guards | Empty-cart redirect (hydration-safe) | ✅ |
+| Server-side orders | Prices rebuilt from the menu; orders persisted to Supabase | ✅ |
+| Staff order list | `/admin/orders` — charge to terminal, settle as cash | ✅ |
+| Counter till | `/admin/pos` — ring up a walk-in, charge card or cash | ✅ |
+| Terminal payment | Windcave HIT on the CHU200TP; poll, buttons, recovery | ✅ |
+| Payment audit trail | `payment_events` records every terminal interaction | ✅ |
+| Admin password login | HMAC session; off in production without an explicit password | ✅ |
+| Online card payment | Windcave REST / Hosted Payment Page | ⬜ on hold |
+| POS certification | Required by Windcave before production go-live | ⬜ pending |
 | SEO meta | Per-page title/description/canonical, OG + Twitter cards | ✅ |
 | Structured data | JSON-LD Restaurant (home) + Menu (menu page) | ✅ |
 | Crawl files | `sitemap.xml` + `robots.txt` (noindex transactional pages) | ✅ |

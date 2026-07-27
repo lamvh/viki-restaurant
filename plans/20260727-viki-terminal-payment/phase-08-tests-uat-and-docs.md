@@ -9,7 +9,7 @@
 
 ## Overview
 - **Priority:** P1
-- **Status:** pending
+- **Status:** 🚧 code + docs done · live UAT and certification outstanding
 - **Description:** Closes the milestone: complete the automated matrix, run UAT **against the physical terminal**, and bring the docs in line. This is the phase where hardware is genuinely required.
 
 ## Key Insights
@@ -97,17 +97,17 @@ beforeEach(() => {
 10. Verify **POS certification is booked**.
 
 ## Todo List
-- [ ] Test matrix complete across all five files
-- [ ] Un-stubbed `fetch` guard in `vitest.setup.ts`
-- [ ] **Tipping confirmed disabled for this MID**, answer recorded in the docs
-- [ ] `docs/terminal-payment-uat-runbook.md` written
-- [ ] T1–T10 executed against the physical terminal
-- [ ] T5 and T6 genuinely performed, not inspected
-- [ ] `windcave-integration.md` terminal section verified
-- [ ] `features.md` / `changelog.md` / `system-architecture.md` / `deployment-guide.md` / `README.md` updated
-- [ ] `.env.example` matches `hit-env.ts`
-- [ ] `test` / `lint` / `build` green; no secret committed
-- [ ] POS certification booked
+- [x] Test matrix complete across all five files
+- [x] Un-stubbed `fetch` guard in `vitest.setup.ts`
+- [ ] **Tipping confirmed disabled for this MID** — needs a Payline check or devsupport (Customer ID `144852`)
+- [x] `docs/terminal-payment-uat-runbook.md` written
+- [ ] T1–T11 executed against the physical terminal — **needs a human at the counter**
+- [ ] T5 (terminal unplugged) and T6 (browser closed mid-sale) genuinely performed, not inspected
+- [x] `windcave-integration.md` terminal section verified
+- [x] `features.md` / `changelog.md` / `system-architecture.md` / `deployment-guide.md` / `README.md` updated
+- [x] `.env.example` matches `hit-env.ts`
+- [x] `tsc` / `lint` / 112 tests green · [ ] `npm run build` not run (dev server was live; it shares `.next`)
+- [ ] POS certification booked with Windcave — external turnaround, gates production
 
 ## Success Criteria
 1. `npm test` green with zero network access.

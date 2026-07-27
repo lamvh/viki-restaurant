@@ -1,11 +1,16 @@
 // Zustand cart/service/UI store (design spec §6). Transient item-modal state
 // (selected options, qty, notes) lives locally in the modal and commits here
-// via addLine. `service`, `cart`, and `lastOrder` persist to localStorage.
+// via addLine. `service` and `cart` persist to localStorage.
+//
+// Order placement is NOT here. Orders are created server-side by
+// `app/(site)/checkout/actions.ts` so the total is computed from the menu rather
+// than the browser, and the confirmation screen reads from the database.
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartLine, Order, Service } from '@/types/cart';
-import { totals, etaFor, type Totals } from '@/lib/pricing';
+
+import { totals, type Totals } from '@/lib/pricing';
+import type { CartLine, Service } from '@/types/cart';
 
 type CartState = {
   service: Service;
@@ -13,13 +18,6 @@ type CartState = {
   cartOpen: boolean;
   /** Id of the menu item whose customisation modal is open, or null. */
   modalItemId: string | null;
-  lastOrder: Order | null;
-  /**
-   * Transient (not persisted) flag: true between placing an order and landing on
-   * the confirmation screen. Lets the checkout guard tell a just-placed empty cart
-   * (navigate to confirmation) from a stale empty cart (redirect to /menu).
-   */
-  justPlaced: boolean;
 
   setService: (service: Service) => void;
   addLine: (line: CartLine) => void;
@@ -30,17 +28,10 @@ type CartState = {
   closeCart: () => void;
   openItem: (id: string) => void;
   closeItem: () => void;
-  placeOrder: () => Order | null;
-  clearJustPlaced: () => void;
 
   count: () => number;
   totals: () => Totals;
 };
-
-/** VK-#### mock order number (design spec §6). */
-function nextOrderNumber(): string {
-  return `VK-${Math.floor(1000 + Math.random() * 9000)}`;
-}
 
 export const useCartStore = create<CartState>()(
   persist(
@@ -49,32 +40,26 @@ export const useCartStore = create<CartState>()(
       cart: [],
       cartOpen: false,
       modalItemId: null,
-      lastOrder: null,
-      justPlaced: false,
 
       setService: (service) => set({ service }),
 
       addLine: (line) =>
         set((state) => {
-          // Adding to the cart starts a new order, so clear any just-placed flag.
           const existing = state.cart.find((l) => l.key === line.key);
           if (existing) {
             // Same customisation → merge quantities rather than duplicate.
             return {
-              justPlaced: false,
               cart: state.cart.map((l) =>
                 l.key === line.key ? { ...l, qty: l.qty + line.qty } : l,
               ),
             };
           }
-          return { justPlaced: false, cart: [...state.cart, line] };
+          return { cart: [...state.cart, line] };
         }),
 
       incLine: (key) =>
         set((state) => ({
-          cart: state.cart.map((l) =>
-            l.key === key ? { ...l, qty: l.qty + 1 } : l,
-          ),
+          cart: state.cart.map((l) => (l.key === key ? { ...l, qty: l.qty + 1 } : l)),
         })),
 
       decLine: (key) =>
@@ -91,34 +76,19 @@ export const useCartStore = create<CartState>()(
       openItem: (id) => set({ modalItemId: id }),
       closeItem: () => set({ modalItemId: null }),
 
-      placeOrder: () => {
-        const { cart, service } = get();
-        if (cart.length === 0) return null;
-
-        const t = totals(cart, service);
-        const order: Order = {
-          number: nextOrderNumber(),
-          total: t.total,
-          points: t.points,
-          service,
-          eta: etaFor(service),
-          placedAt: Date.now(),
-        };
-        set({ cart: [], cartOpen: false, lastOrder: order, justPlaced: true });
-        return order;
-      },
-
-      clearJustPlaced: () => set({ justPlaced: false }),
-
       count: () => get().cart.reduce((sum, l) => sum + l.qty, 0),
       totals: () => totals(get().cart, get().service),
     }),
     {
       name: 'viki-cart',
+      version: 1,
+      // v0 lines predate `choiceIds`, so the server cannot reprice them. Dropping
+      // one in-progress cart once beats shipping a parser that guesses.
+      migrate: (state, version) =>
+        version === 0 ? { ...(state as object), cart: [] } : state,
       partialize: (state) => ({
         service: state.service,
         cart: state.cart,
-        lastOrder: state.lastOrder,
       }),
     },
   ),

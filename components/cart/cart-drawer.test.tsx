@@ -14,6 +14,7 @@ function line(over: Partial<CartLine> = {}): CartLine {
     qty: 1,
     labels: [],
     notes: '',
+    choiceIds: [],
     ...over,
   };
 }
@@ -25,8 +26,6 @@ function reset(cart: CartLine[], extra: Partial<ReturnType<typeof useCartStore.g
     cart,
     cartOpen: true,
     modalItemId: null,
-    lastOrder: null,
-    justPlaced: false,
     ...extra,
   });
 }

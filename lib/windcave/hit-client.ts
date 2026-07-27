@@ -108,4 +108,23 @@ export async function sendButton(
   });
 }
 
+/**
+ * Retrieves the terminal's own EFTPOS receipt text for a past transaction.
+ *
+ * This only *fetches* text — HIT has no way to send arbitrary content to the
+ * device's printer, so an itemised food bill cannot be printed there. Pass
+ * `duplicate` to mark the copy as a reprint.
+ */
+export async function getReceipt(txnRef: string, duplicate = false): Promise<HitStatus> {
+  const env = hitEnv();
+
+  return post({
+    Station: env.station,
+    TxnType: 'Receipt',
+    TxnRef: txnRef,
+    DuplicateFlag: duplicate ? '1' : '0',
+    ReceiptType: '2',
+  });
+}
+
 export { formatHitAmount, centsMatch } from './hit-xml';

@@ -13,19 +13,50 @@ sections (hero, story, location) are server components where possible.
 |---|---|---|
 | `/` | Home | hero, popular dishes, story band, location |
 | `/menu` | Menu | sticky category chips + item rows; opens item modal |
-| `/checkout` | Checkout | details + payment + live order summary |
-| `/order/confirmed` | Order confirmed | reads last order from store |
+| `/checkout` | Checkout | details + live order summary; submits to the server |
+| `/order/[token]` | Order confirmed | server-rendered from the database, `noindex` |
+| `/admin/pos` | Counter till | ring up a walk-in, then charge card or cash |
+| `/admin/orders` | Staff orders | charge to the card terminal, settle as cash |
+| `/api/admin/terminal/status` | Terminal relay | staff-guarded poll/button proxy |
 
 **Global overlays** (mounted in `app/layout.tsx`, driven by store): cart drawer,
 item modal.
 
-**Guards:** `/checkout` with empty cart → `/menu`; `/order/confirmed` with no last
-order → `/`.
+**Guards:** `/checkout` with empty cart → `/menu`; unknown `/order/[token]` → 404;
+all `/admin/*` gated by `middleware.ts` **and** a per-page `requireStaff()`.
+
+## Payment
+
+Two channels share one order path.
+
+| Layer | Module |
+|---|---|
+| Repricing boundary | `lib/orders/rebuild-cart.ts` — rebuilds lines from the menu |
+| Order creation | `lib/orders/create-order.ts` — re-totals, persists via service role |
+| Counter sale | `app/admin/pos/actions.ts` — creates then charges, via the same path |
+| Terminal (HIT) | `lib/windcave/hit-{env,types,xml,client}.ts` |
+| Terminal flow | `lib/orders/terminal-payment.ts` — start, poll, finalise, cash settle |
+| Audit trail | `lib/orders/payment-events.ts` → `payment_events` |
+
+**Data flow (card present):** staff action → `startTerminalPayment` persists
+`hit_txn_ref` → Purchase XML → browser polls `/api/admin/terminal/status` →
+`finaliseTerminalPayment` transitions the order once, conditionally.
+
+**Invariants:** the amount always comes from `orders.total`; the HIT key never
+reaches a browser; `TxnRef` is written before the terminal request so an
+interrupted sale stays recoverable; every state transition is a conditional
+update, so concurrent finalises produce exactly one.
+
+Online card payment (Windcave REST / HPP) is designed and on hold; its columns
+already exist in `0005`.
 
 ## State (Zustand) — `store/cart-store.ts`
 
-- State: `service` ('pickup' | 'delivery'), `cart: CartLine[]`, `cartOpen`, `lastOrder`.
-- Persisted: `service` + `cart` + `lastOrder` to `localStorage`.
+- State: `service` ('pickup' | 'delivery'), `cart: CartLine[]`, `cartOpen`, `modalItemId`.
+- Persisted (v1): `service` + `cart` to `localStorage`. Cleared on the confirmation
+  page, never at submit — a failed payment must return an intact cart.
+- Order placement is **not** here: it is a server action, so the total is computed
+  from the menu rather than the browser.
 - Transient modal state (selected options, qty, notes) lives locally in the item modal.
 
 ## Data & pricing

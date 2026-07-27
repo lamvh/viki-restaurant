@@ -5,16 +5,25 @@ folder under `plans/` when picked up.
 
 **Legend:** 🔴 blocker · 🟠 should do next · 🟡 worth doing · ⚪ someday · ✅ done
 
-Last reviewed: 2026-07-27
+Last reviewed: 2026-07-27 (after terminal milestone code completion)
 
 ---
 
 ## Active milestone
 
-**[Terminal payment (Windcave HIT)](./20260727-viki-terminal-payment/plan.md)** — 40h, 8 phases, pending.
-Card-present payment on the physical CHU200TP, plus the shared server-side order
-path both channels need. **Phases 01–02 (9h) exist purely to prove the API and
-terminal link work** before any flow is built on them.
+**[Terminal payment (Windcave HIT)](./20260727-viki-terminal-payment/plan.md)** — 8 phases,
+**code complete, live UAT outstanding**. Phases 01–07 done; Phase 08 has its
+automated tests and docs done, but the runbook has not been executed against the
+physical terminal.
+
+Outstanding before this can be called finished:
+
+| | Item |
+|---|---|
+| 🔴 | Run [`terminal-payment-uat-runbook.md`](../docs/terminal-payment-uat-runbook.md) T1–T11 with the terminal — **T5/T6 (interrupted sale) especially** |
+| 🔴 | Confirm tipping is off for this MID |
+| 🔴 | Book POS certification with Windcave |
+| 🟠 | `npm run build` — not run while the dev server was live (they share `.next`) |
 
 ## On hold
 
@@ -30,10 +39,11 @@ card option, retry, paid/failed states) noted in its plan.
 | | Item | Notes |
 |---|---|---|
 | 🔴 | **Rotate the leaked HIT key and Payline password** | The terminal onboarding email exposed `ScrHITKey` and the `VinapageUAT_Payline` password in plain text through an untrusted channel. **Rotate both in Payline before wiring anything up** — otherwise the first thing the integration does is authenticate with a leaked key. Neither value is in any tracked file. |
-| 🔴 | **`WINDCAVE_HIT_KEY` in `.env.local`** | The rotated key. Terminal Phases 02 and 06–08 cannot be tested without it. |
+| ✅ | **`WINDCAVE_HIT_KEY` in `.env.local`** | In place; the terminal authenticates. |
+| ✅ | **`WINDCAVE_HIT_VENDOR_ID`** | Real Windcave-assigned value is set in `.env.local`. The code no longer falls back to a placeholder — a missing value now fails fast with a named-variable error. |
 | 🔴 | **Windcave POS certification** | Mandatory before the **card-present** channel runs in production. Windcave asks for as much notice as possible — book at milestone **start**, not end. |
-| ✅ | **Physical terminal delivery** | CHU200TP, serial `3425240086` — **received and on hand** as of 2026-07-27. No longer blocking. |
-| 🔴 | **Terminal pre-flight** | Before the Phase 02 spike: inspect the seal (**do not power on a broken-seal unit** — call Support), confirm the serial matches `WINDCAVE_HIT_STATION`, and get it network-reachable on **TCP port 65** (`uatscr.windcave.com`). A blocked port means the terminal never comes online, and it presents identically to a broken integration. Now the most likely non-code failure. |
+| ✅ | **Physical terminal delivery** | Received, on hand, and **charging successfully** as of 2026-07-27. |
+| ✅ | **Terminal pre-flight** | Done — the connection spike ran a real sale end to end. |
 | ⏸️ | **Windcave eCom certification** | For the **online** channel — a separate booking from POS certification. Deferred with that milestone. |
 | ⏸️ | **`WINDCAVE_API_KEY` not yet generated** | REST key for `VinapageUAT_API`, distinct from the HIT key. Needed only when online payment resumes. |
 | ⏸️ | **Public HTTPS URL for FPRN** | Tunnel or Vercel preview. Online channel only — the terminal channel needs no inbound callback. |
@@ -58,13 +68,23 @@ money is moving.
 
 ---
 
+## Documentation to extract
+
+| | Item | Notes |
+|---|---|---|
+| 🟠 | **Rewrite the HIT integration doc as a reusable guide** | `docs/windcave-integration.md` is currently Viki-specific (this account, this station, this app's routes). Rewrite the terminal half as a **standalone guide to integrating a Windcave HIT device**, portable to other projects and kept in this repo as the reference copy. Should cover: the XML envelope (`user`/`key` as root attributes, field order matters), `VendorId` being required, the `Response`/`TransactionIsComplete` rejection shape, two-letter `Result` codes, `AmtA` in **cents**, button presses as a separate `TxnType=UI`, no `Cancel` TxnType, and the persist-`TxnRef`-before-POST rule for recovering an interrupted sale. All eleven facts were verified against a live terminal — that empirical grounding is the part worth keeping, since several contradict a plain reading of the spec PDF. Keep account-specific values out; make it a guide, not a config file. |
+
+---
+
 ## Surfaced by the terminal design
 
 | | Item | Why it matters |
 |---|---|---|
-| 🟠 | **Remove the terminal spike surface** | `/admin/terminal-test` charges an arbitrary fixed amount to the reader. Fine as a Phase 02 diagnostic; **not** something to leave mounted in admin. Terminal Phase 07 deletes it — verify it actually went. |
+| ✅ | **Remove the terminal spike surface** | `/admin/terminal-test` deleted in Phase 07, along with its panel and debug dumps. `terminal-display.tsx` survives — the real dialog reuses it. |
 | 🟡 | **Should cash settlement be admin-only?** | Marking an order paid in cash is the one action that records money received with no gateway trail. Currently any staff role can. Say the word and it becomes `requireAdmin()`. |
-| ⚪ | **Full counter POS** | Ringing up walk-ins from a menu grid in admin. Explicitly deferred — the current scope only charges orders that already exist. |
+| ✅ | **Full counter POS** | **Built 2026-07-27** at `/admin/pos`, reversing the earlier deferral. The original scope assumed every order arrived online first, which is backwards for a counter terminal. Reuses `createOrder`, so pricing and recovery are shared. |
+| 🟡 | **Option customisation at the till** | Tapping a dish uses its default options. Fine today — no menu item has option groups — but a "Large / add egg" dish would need a modal at the counter. |
+| 🟡 | **Reprint a card receipt** | `getReceipt(txnRef, duplicate)` is implemented in `hit-client.ts` but not yet surfaced in the UI. Useful when a customer asks for another copy of the card slip. |
 | ⚪ | **Refunds via HIT** | `TxnType=Refund` exists in the protocol. Using Payline is fine at low volume. |
 | ⚪ | **Multiple terminals** | One station id, hardcoded from config. Revisit only if a second reader appears. |
 | ⚪ | **Split bill / tipping** | Confirmed not wanted. The amount-mismatch guard stays as a safety net; if it ever fires, tipping was switched on somewhere. |
@@ -93,7 +113,7 @@ money is moving.
 
 | | Item | Notes |
 |---|---|---|
-| 🔴 | **`orders_anon_insert` RLS hole** | `0004_rls_policies.sql:31` grants anon insert with `check (true)` — anyone with the public anon key can forge orders at any total. Harmless while nothing treats orders as real; a genuine problem the moment a card terminal charges against one. **Scheduled fix: terminal Phase 03** via a `drop policy` in `0005`. Not yet applied. |
+| ✅ | **`orders_anon_insert` RLS hole** | Dropped in `0005`. Verified: anon insert refused (42501), anon reads of `orders` / `payment_events` return zero rows against a seeded row. |
 | 🟡 | **No transaction across order + items insert** | Supabase's REST client cannot do multi-table transactions; terminal Phase 04 uses a compensating delete. Replace with a Postgres function if orphans ever appear in practice. |
 | 🟡 | **Client and server both compute pricing** | Same module (`lib/pricing.ts`) both sides, so they cannot drift — but the duplication is worth remembering when changing discount rules. |
 | ⚪ | **`tsconfig.tsbuildinfo` is committed** | Build artefact in git. Add to `.gitignore`. |

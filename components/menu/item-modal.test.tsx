@@ -46,8 +46,6 @@ function reset() {
     cart: [],
     cartOpen: false,
     modalItemId: null,
-    lastOrder: null,
-    justPlaced: false,
   });
 }
 

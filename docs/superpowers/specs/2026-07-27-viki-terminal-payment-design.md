@@ -39,8 +39,12 @@ today nothing ever writes an order to the database.
 ## 3. Non-Goals (YAGNI)
 
 - **Online card payment.** Separate milestone, built on this foundation.
-- **Full counter POS.** No ringing up walk-ins from a menu grid in admin. Staff
-  charge orders that already exist.
+- ~~**Full counter POS.**~~ **Reversed 2026-07-27.** The original scope only
+  charged orders that already existed online. That was wrong for the actual use:
+  a card terminal on a counter serves walk-in customers, and requiring them to
+  order online first inverts the flow. `/admin/pos` now rings up counter sales
+  directly. It reuses `createOrder`, so pricing, the audit trail and
+  interrupted-sale recovery are shared rather than forked.
 - **Refunds via HIT.** `TxnType=Refund` exists; use Payline for now.
 - **Multiple terminals.** One station, hardcoded from config.
 - **Offline/store-and-forward.** If the terminal is unreachable, payment fails and

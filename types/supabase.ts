@@ -154,6 +154,7 @@ export type Database = {
           id: string
           item_name: string
           line_total: number
+          notes: string | null
           options: Json
           order_id: string
           quantity: number
@@ -163,6 +164,7 @@ export type Database = {
           id?: string
           item_name: string
           line_total: number
+          notes?: string | null
           options?: Json
           order_id: string
           quantity: number
@@ -172,6 +174,7 @@ export type Database = {
           id?: string
           item_name?: string
           line_total?: number
+          notes?: string | null
           options?: Json
           order_id?: string
           quantity?: number
@@ -189,39 +192,113 @@ export type Database = {
       }
       orders: {
         Row: {
+          address: string | null
+          card_receipt: string | null
           created_at: string
           customer_name: string | null
           customer_phone: string | null
+          email: string | null
+          hit_attempt: number
+          hit_txn_ref: string | null
           id: string
           note: string | null
+          notification_token: string
+          paid_at: string | null
+          payment_method: string
+          payment_status: string
+          public_token: string
+          reference: string
           service: string
           status: string
           subtotal: number
           total: number
+          windcave_links: Json | null
+          windcave_session_id: string | null
+          windcave_transaction_id: string | null
         }
         Insert: {
+          address?: string | null
+          card_receipt?: string | null
           created_at?: string
           customer_name?: string | null
           customer_phone?: string | null
+          email?: string | null
+          hit_attempt?: number
+          hit_txn_ref?: string | null
           id?: string
           note?: string | null
+          notification_token: string
+          paid_at?: string | null
+          payment_method: string
+          payment_status: string
+          public_token: string
+          reference: string
           service: string
           status?: string
           subtotal: number
           total: number
+          windcave_links?: Json | null
+          windcave_session_id?: string | null
+          windcave_transaction_id?: string | null
         }
         Update: {
+          address?: string | null
+          card_receipt?: string | null
           created_at?: string
           customer_name?: string | null
           customer_phone?: string | null
+          email?: string | null
+          hit_attempt?: number
+          hit_txn_ref?: string | null
           id?: string
           note?: string | null
+          notification_token?: string
+          paid_at?: string | null
+          payment_method?: string
+          payment_status?: string
+          public_token?: string
+          reference?: string
           service?: string
           status?: string
           subtotal?: number
           total?: number
+          windcave_links?: Json | null
+          windcave_session_id?: string | null
+          windcave_transaction_id?: string | null
         }
         Relationships: []
+      }
+      payment_events: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          order_id: string
+          raw: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          order_id: string
+          raw?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          order_id?: string
+          raw?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

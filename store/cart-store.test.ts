@@ -11,6 +11,7 @@ function line(overrides: Partial<CartLine> = {}): CartLine {
     qty: 1,
     labels: [],
     notes: '',
+    choiceIds: [],
     ...overrides,
   };
 }
@@ -21,7 +22,6 @@ beforeEach(() => {
     service: 'pickup',
     cart: [],
     cartOpen: false,
-    lastOrder: null,
   });
 });
 
@@ -78,67 +78,5 @@ describe('service + totals', () => {
     expect(useCartStore.getState().totals().fee).toBe(0);
     s.setService('delivery');
     expect(useCartStore.getState().totals().fee).toBe(4);
-  });
-});
-
-describe('placeOrder', () => {
-  it('returns null and sets no order for an empty cart', () => {
-    const order = useCartStore.getState().placeOrder();
-    expect(order).toBeNull();
-    expect(useCartStore.getState().lastOrder).toBeNull();
-  });
-
-  it('builds an order, clears the cart, and stores lastOrder', () => {
-    const s = useCartStore.getState();
-    s.setService('delivery');
-    s.addLine(line({ unit: 40, qty: 1 })); // subtotal 40, discount 4, fee 4 → total 40
-    const order = useCartStore.getState().placeOrder();
-
-    expect(order).not.toBeNull();
-    expect(order!.number).toMatch(/^VK-\d{4}$/);
-    expect(order!.service).toBe('delivery');
-    expect(order!.eta).toBe('30–40 min');
-    expect(order!.total).toBeCloseTo(40, 5);
-    expect(order!.points).toBe(360); // (40 - 4) * 10
-
-    const state = useCartStore.getState();
-    expect(state.cart).toHaveLength(0);
-    expect(state.cartOpen).toBe(false);
-    expect(state.lastOrder).toEqual(order);
-  });
-});
-
-describe('justPlaced transition', () => {
-  it('is set by placeOrder so the checkout guard can defer the /menu redirect', () => {
-    const s = useCartStore.getState();
-    s.addLine(line({ qty: 1 }));
-    expect(useCartStore.getState().justPlaced).toBe(false);
-    useCartStore.getState().placeOrder();
-    expect(useCartStore.getState().justPlaced).toBe(true);
-  });
-
-  it('is cleared when a new order starts (addLine)', () => {
-    const s = useCartStore.getState();
-    s.addLine(line({ qty: 1 }));
-    s.placeOrder();
-    expect(useCartStore.getState().justPlaced).toBe(true);
-    useCartStore.getState().addLine(line({ qty: 1 }));
-    expect(useCartStore.getState().justPlaced).toBe(false);
-  });
-
-  it('is cleared by clearJustPlaced (on confirmation mount)', () => {
-    const s = useCartStore.getState();
-    s.addLine(line({ qty: 1 }));
-    s.placeOrder();
-    useCartStore.getState().clearJustPlaced();
-    expect(useCartStore.getState().justPlaced).toBe(false);
-  });
-
-  it('does not persist justPlaced to localStorage', () => {
-    const s = useCartStore.getState();
-    s.addLine(line({ qty: 1 }));
-    s.placeOrder();
-    const persisted = JSON.parse(localStorage.getItem('viki-cart') ?? '{}');
-    expect(persisted.state?.justPlaced).toBeUndefined();
   });
 });

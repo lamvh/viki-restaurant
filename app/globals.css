@@ -53,3 +53,32 @@ h3 {
 * {
   box-sizing: border-box;
 }
+
+/* Receipt printing — the admin chrome must not appear on an 80mm roll. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff;
+  }
+
+  /* Drop the admin shell's padding and borders so the receipt starts at the
+     top of the page instead of halfway down it. */
+  body * {
+    box-shadow: none !important;
+  }
+
+  .receipt {
+    width: auto;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  @page {
+    margin: 4mm;
+  }
+}
