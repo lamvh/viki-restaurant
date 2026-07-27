@@ -12,6 +12,9 @@ const NAV: NavItem[] = [
   { href: '/admin/menu', label: 'Menu', soon: true },
   { href: '/admin/settings', label: 'Settings', adminOnly: true, soon: true },
   { href: '/admin/users', label: 'Users', adminOnly: true, soon: true },
+  // Temporary — Windcave HIT connection spike. Removed with the route once
+  // /admin/orders can charge a real order.
+  { href: '/admin/terminal-test', label: 'Terminal test' },
 ];
 
 /** Fixed admin sidebar. Admin-only links are hidden for staff. */
