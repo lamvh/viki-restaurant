@@ -1,4 +1,8 @@
+import { cookies } from 'next/headers';
+
 import { createClient } from '@/lib/supabase/server-client';
+
+import { ADMIN_SESSION_COOKIE, verifyAdminToken } from './admin-session';
 
 export type Role = 'admin' | 'staff';
 
@@ -15,6 +19,15 @@ export type SessionUser = {
  * i.e. fail closed.
  */
 export async function getSessionUser(): Promise<SessionUser | null> {
+  // Password-based admin session first — it needs no Supabase user, so the panel
+  // stays reachable when Auth is not provisioned. Disabled in production unless
+  // ADMIN_LOGIN_PASSWORD is set; see lib/auth/admin-session.ts.
+  const store = await cookies();
+  const username = await verifyAdminToken(store.get(ADMIN_SESSION_COOKIE)?.value);
+  if (username) {
+    return { id: `admin-session:${username}`, email: username, role: 'admin' };
+  }
+
   const supabase = await createClient();
 
   const {
