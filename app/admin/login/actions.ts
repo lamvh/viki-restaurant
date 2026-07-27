@@ -9,7 +9,7 @@ import {
   createAdminToken,
 } from '@/lib/auth/admin-session';
 
-export type AdminLoginState = { error: string } | null;
+import type { AdminLoginState } from './login-state';
 
 /**
  * Password login that does not require a Supabase user. Off in production

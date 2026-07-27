@@ -2,7 +2,8 @@
 
 import { useActionState } from 'react';
 
-import { signInWithPassword, type AdminLoginState } from '@/app/admin/login/actions';
+import { signInWithPassword } from '@/app/admin/login/actions';
+import type { AdminLoginState } from '@/app/admin/login/login-state';
 
 /**
  * Username + password login that needs no Supabase user. Rendered only when
