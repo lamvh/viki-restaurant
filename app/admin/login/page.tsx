@@ -28,17 +28,23 @@ export default async function AdminLoginPage() {
         <p className="text-sm text-ink/70">Sign in to manage orders, menu and settings.</p>
       </div>
 
+      {/* One visible form. When both methods work, password is primary and the
+          Supabase form stays collapsed — showing two identical-looking forms
+          just makes people guess which one is theirs. */}
       {passwordLogin ? <PasswordLoginForm devDefaults={devDefaults} /> : null}
 
-      {passwordLogin && supabaseLogin ? (
-        <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-ink/40">
-          <span className="h-px flex-1 bg-line" />
-          or
-          <span className="h-px flex-1 bg-line" />
-        </div>
-      ) : null}
+      {supabaseLogin && !passwordLogin ? <LoginForm /> : null}
 
-      {supabaseLogin ? <LoginForm /> : null}
+      {supabaseLogin && passwordLogin ? (
+        <details className="border-t border-line pt-4">
+          <summary className="cursor-pointer text-sm text-ink/60">
+            Sign in with a Supabase account instead
+          </summary>
+          <div className="pt-4">
+            <LoginForm />
+          </div>
+        </details>
+      ) : null}
 
       {!passwordLogin && !supabaseLogin ? (
         <p className="rounded-[var(--radius-btn)] border border-line px-3 py-2 text-sm text-ink/70">

@@ -5,9 +5,10 @@ import {
   centsMatch,
   formatHitAmount,
   parseScrResponse,
+  redactScrRequest,
 } from './hit-xml';
 
-const AUTH = { user: 'VikiUAT', key: 'secret-key', station: '3425240086' };
+const AUTH = { user: 'VikiUAT', key: 'secret-key' };
 
 // Envelopes below mirror the PXHIT v2.3 samples verbatim in shape.
 const IN_FLIGHT = `<Scr>
@@ -75,13 +76,34 @@ describe('buildScrRequest', () => {
     expect(xml).not.toContain('<key>');
   });
 
-  it('always includes the station and echoes supplied fields', () => {
-    const xml = buildScrRequest(AUTH, { TxnType: 'Purchase', Amount: '12.50', Cur: 'NZD' });
+  it('echoes supplied fields', () => {
+    const xml = buildScrRequest(AUTH, {
+      Station: '3425240086',
+      TxnType: 'Purchase',
+      Amount: '12.50',
+      Cur: 'NZD',
+    });
 
     expect(xml).toContain('<Station>3425240086</Station>');
     expect(xml).toContain('<TxnType>Purchase</TxnType>');
     expect(xml).toContain('<Amount>12.50</Amount>');
     expect(xml).toContain('<Cur>NZD</Cur>');
+  });
+
+  it('preserves field order, which the service validates as a sequence', () => {
+    const xml = buildScrRequest(AUTH, {
+      Amount: '1.00',
+      Cur: 'NZD',
+      TxnType: 'Purchase',
+      Station: '3425240086',
+      TxnRef: 'VK-1',
+    });
+
+    // Reordering these silently fails against a real terminal, so pin it.
+    expect(xml.indexOf('<Amount>')).toBeLessThan(xml.indexOf('<Cur>'));
+    expect(xml.indexOf('<Cur>')).toBeLessThan(xml.indexOf('<TxnType>'));
+    expect(xml.indexOf('<TxnType>')).toBeLessThan(xml.indexOf('<Station>'));
+    expect(xml.indexOf('<Station>')).toBeLessThan(xml.indexOf('<TxnRef>'));
   });
 
   it('omits undefined fields rather than emitting empty elements', () => {
@@ -180,5 +202,42 @@ describe('amounts', () => {
     // 10.1 * 100 is 1009.9999… in IEEE 754 — a naive comparison fails here.
     expect(centsMatch(10.1, 1010)).toBe(true);
     expect(centsMatch(0.29, 29)).toBe(true);
+  });
+});
+
+describe('parseScrResponse — envelope rejection', () => {
+  // Verbatim from a live UAT reply. Note it uses neither Complete nor Result,
+  // so reading only those loses the reason entirely.
+  const REJECTED =
+    '<Scr><Response Code="XX">Missing tag VendorID</Response>' +
+    '<TransactionIsComplete>1</TransactionIsComplete></Scr>';
+
+  it('surfaces the rejection code and message', () => {
+    const status = parseScrResponse(REJECTED);
+
+    expect(status.errorCode).toBe('XX');
+    expect(status.errorMessage).toBe('Missing tag VendorID');
+  });
+
+  it('treats TransactionIsComplete as complete', () => {
+    // Otherwise the UI polls forever against a request that was never accepted.
+    expect(parseScrResponse(REJECTED).complete).toBe(true);
+  });
+
+  it('carries no result, so it cannot be mistaken for a declined card', () => {
+    expect(parseScrResponse(REJECTED).result).toBeUndefined();
+  });
+});
+
+describe('redactScrRequest', () => {
+  it('removes the API key so a request can be shown on screen', () => {
+    const xml = buildScrRequest(
+      { user: 'VikiUAT', key: 'super-secret' },
+      { TxnType: 'Status' },
+    );
+
+    const redacted = redactScrRequest(xml);
+    expect(redacted).not.toContain('super-secret');
+    expect(redacted).toContain('user="VikiUAT"');
   });
 });

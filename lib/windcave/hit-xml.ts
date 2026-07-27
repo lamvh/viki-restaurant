@@ -33,11 +33,10 @@ const builder = new XMLBuilder({
   suppressEmptyNode: true,
 });
 
-/** Credentials + station, supplied by the caller so this module stays pure. */
+/** Credentials, supplied by the caller so this module stays pure. */
 export type ScrAuth = {
   user: string;
   key: string;
-  station: string;
 };
 
 type ScrNode = Record<string, unknown>;
@@ -99,8 +98,23 @@ export function parseScrResponse(xml: string): HitStatus {
     throw new Error('HIT response contained no <Scr> element');
   }
 
+  // Envelope-level rejection uses a different shape entirely:
+  //   <Scr><Response Code="XX">Missing tag …</Response>
+  //        <TransactionIsComplete>1</TransactionIsComplete></Scr>
+  // No Complete, no ReCo, no Result — so it must be read separately or the
+  // reason is silently lost.
+  const response = scr.Response;
+  const errorMessage = asText(response);
+  const errorCode =
+    response && typeof response === 'object'
+      ? ((response as ScrNode)[`${ATTR}Code`] as string | undefined)
+      : undefined;
+
   return {
-    complete: asText(scr.Complete) === '1',
+    complete:
+      asText(scr.Complete) === '1' || asText(scr.TransactionIsComplete) === '1',
+    errorCode,
+    errorMessage,
     statusId: asText(scr.StatusId),
     txnStatusId: asText(scr.TxnStatusId),
     txnRef: asText(scr.TxnRef),
@@ -115,12 +129,18 @@ export function parseScrResponse(xml: string): HitStatus {
   };
 }
 
-/** Builds a `<Scr action="doScrHIT">` request. `user`/`key` become root attributes. */
+/**
+ * Builds a `<Scr action="doScrHIT">` request. `user`/`key` become root attributes.
+ *
+ * **Element order is preserved from `fields` and matters.** The service validates
+ * against a sequence, so callers pass fields in the order the specification lists
+ * them rather than relying on this function to arrange them.
+ */
 export function buildScrRequest(
   auth: ScrAuth,
   fields: Record<string, string | undefined>,
 ): string {
-  const children: Record<string, string> = { Station: auth.station };
+  const children: Record<string, string> = {};
   for (const [name, value] of Object.entries(fields)) {
     if (value !== undefined) children[name] = value;
   }
@@ -133,6 +153,11 @@ export function buildScrRequest(
       ...children,
     },
   }) as string;
+}
+
+/** Strips credentials so a request can be logged or shown on screen. */
+export function redactScrRequest(xml: string): string {
+  return xml.replace(/key="[^"]*"/g, 'key="***REDACTED***"');
 }
 
 /** Money as HIT expects it on a request: a two-decimal string, never a number. */

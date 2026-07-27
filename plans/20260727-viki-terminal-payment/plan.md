@@ -49,7 +49,7 @@ terminal respond?** Nothing else is built until that is proven. Flow comes after
 | # | Phase | Effort | Status | Depends on |
 |---|---|---|---|---|
 | 01 | [HIT XML client](./phase-01-hit-xml-client.md) | 5h | ✅ done | — |
-| 02 | [**Terminal connection spike**](./phase-02-terminal-connection-spike.md) | 4h | ⬜ pending | 01 |
+| 02 | [**Terminal connection spike**](./phase-02-terminal-connection-spike.md) | 4h | ✅ done | 01 |
 | 03 | [Order + payment schema](./phase-03-order-and-payment-schema.md) | 5h | ⬜ pending | 02 |
 | 04 | [Server-side order creation](./phase-04-server-side-order-creation.md) | 6h | ⬜ pending | 03 |
 | 05 | [Confirmation page + checkout rewiring](./phase-05-confirmation-and-checkout-rewiring.md) | 4h | ⬜ pending | 04 |

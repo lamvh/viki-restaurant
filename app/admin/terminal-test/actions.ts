@@ -1,8 +1,8 @@
 'use server';
 
-// Connection spike for the Windcave HIT terminal. Fixed amount, no order, no
-// database — this exists to prove credentials, envelope, and device
-// reachability. Removed once the real charge flow lands.
+// Connection spike for the Windcave HIT terminal. No order, no database — this
+// exists to prove credentials, envelope, and device behaviour. Removed once the
+// real charge flow lands.
 
 import { requireStaff } from '@/lib/auth/require-role';
 import {
@@ -13,7 +13,7 @@ import {
 } from '@/lib/windcave/hit-client';
 import type { HitButtonValue } from '@/lib/windcave/hit-types';
 
-import { TEST_AMOUNT, type SpikeResult } from './spike-config';
+import { parseTestAmount, type SpikeResult } from './spike-config';
 
 function fail(cause: unknown): SpikeResult {
   // Surfaced verbatim on screen — the whole point of a spike is visibility.
@@ -21,17 +21,21 @@ function fail(cause: unknown): SpikeResult {
 }
 
 /**
- * Starts a fixed-amount test sale. `TxnRef` must be unique per attempt or the
- * terminal replays the previous result, which reads as a hardware fault.
+ * Starts a sale for the submitted amount. `TxnRef` must be unique per attempt or
+ * the terminal replays the previous result, which reads as a hardware fault.
  */
-export async function startTestPurchase(): Promise<SpikeResult> {
+export async function startTestPurchase(rawAmount: string): Promise<SpikeResult> {
   await requireStaff();
+
+  // Validated server-side. A form value must never reach a card reader unchecked.
+  const amount = parseTestAmount(rawAmount);
+  if (!amount.ok) return { ok: false, error: amount.error };
 
   const txnRef = `TEST-${Date.now()}`;
 
   try {
     const status = await startPurchase({
-      amount: formatHitAmount(TEST_AMOUNT),
+      amount: formatHitAmount(amount.value),
       currency: process.env.WINDCAVE_CURRENCY ?? 'NZD',
       txnRef,
     });
@@ -52,8 +56,10 @@ export async function pollTestPurchase(txnRef: string): Promise<SpikeResult> {
 }
 
 /**
- * Relays a soft-button press. This is a separate `UI` transaction, not a field
- * on Status — confirmed against PXHIT v2.3. Press, then resume polling.
+ * Relays a soft-button press — a separate `UI` transaction, not a field on
+ * Status. This is also the only way to cancel: the protocol has no Cancel
+ * TxnType, so a sale can be stopped from here only while the terminal is
+ * offering a button. Otherwise it must be cancelled on the device itself.
  */
 export async function pressTestButton(
   txnRef: string,

@@ -4,7 +4,7 @@ import 'server-only';
 // live in ./hit-xml so they stay pure and testable; this module only speaks HTTP.
 
 import { hitEnv } from './hit-env';
-import { buildScrRequest, parseScrResponse } from './hit-xml';
+import { buildScrRequest, parseScrResponse, redactScrRequest } from './hit-xml';
 import type { HitButtonValue, HitStatus, PurchaseInput } from './hit-types';
 
 /** Terminals are slower than web APIs — a card prompt can sit for a while. */
@@ -23,7 +23,7 @@ export class HitError extends Error {
 
 async function post(fields: Record<string, string | undefined>): Promise<HitStatus> {
   const env = hitEnv();
-  const xml = buildScrRequest({ user: env.user, key: env.key, station: env.station }, fields);
+  const xml = buildScrRequest({ user: env.user, key: env.key }, fields);
 
   let response: Response;
   try {
@@ -48,32 +48,43 @@ async function post(fields: Record<string, string | undefined>): Promise<HitStat
   }
 
   try {
-    // `raw` is carried for diagnostics: a wrong envelope parses to a shape full
-    // of undefined, and only the unparsed body reveals why.
-    return { ...parseScrResponse(text), raw: text };
+    // `raw`/`rawRequest` are carried for diagnostics: a wrong envelope parses to
+    // a shape full of undefined, and only the unparsed bodies reveal why. The
+    // request is redacted — the API key rides on the root element.
+    return { ...parseScrResponse(text), raw: text, rawRequest: redactScrRequest(xml) };
   } catch {
     throw new HitError('Terminal returned malformed XML', response.status, text);
   }
 }
 
-/** Starts a sale on the terminal. `txnRef` must be unique per attempt. */
+/**
+ * Starts a sale on the terminal. `txnRef` must be unique per attempt.
+ *
+ * Field order below mirrors the specification's Purchase sample exactly — the
+ * service validates against a sequence, so reordering these silently fails.
+ */
 export async function startPurchase(input: PurchaseInput): Promise<HitStatus> {
   const env = hitEnv();
 
   return post({
-    TxnType: 'Purchase',
-    TxnRef: input.txnRef,
     Amount: input.amount,
     Cur: input.currency,
+    TxnType: 'Purchase',
+    Station: env.station,
+    TxnRef: input.txnRef,
     DeviceId: env.deviceId,
     PosName: env.posName,
+    PosVersion: env.posVersion,
+    VendorId: env.vendorId,
     MRef: input.merchantReference,
   });
 }
 
 /** Polls an in-flight transaction. Poll until `complete` is true. */
 export async function pollStatus(txnRef: string): Promise<HitStatus> {
-  return post({ TxnType: 'Status', TxnRef: txnRef });
+  const env = hitEnv();
+
+  return post({ Station: env.station, TxnType: 'Status', TxnRef: txnRef });
 }
 
 /**
@@ -85,7 +96,10 @@ export async function sendButton(
   name: 'B1' | 'B2',
   value: HitButtonValue,
 ): Promise<HitStatus> {
+  const env = hitEnv();
+
   return post({
+    Station: env.station,
     TxnType: 'UI',
     UiType: 'Bn',
     Name: name,

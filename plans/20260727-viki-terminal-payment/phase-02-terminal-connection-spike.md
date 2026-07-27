@@ -9,7 +9,7 @@
 
 ## Overview
 - **Priority:** P0 — **this is the milestone's first real goal**
-- **Status:** pending
+- **Status:** ✅ done — terminal charging successfully
 - **Description:** Prove the whole HIT round-trip against the physical terminal, with **no orders, no database, no checkout involved**. One admin-only screen charges a fixed amount, polls, and shows every raw response. The point is to confirm the API works and the terminal answers before any flow is built on top of it.
 
 ## Why this comes before the order path
@@ -167,16 +167,16 @@ and `import type { HitButtonValue, HitStatus } from '@/lib/windcave/hit-types';`
 8. `npm run lint`, `npm run build`.
 
 ## Todo List
-- [ ] **Seal inspected; serial matches `3425240086`**
-- [ ] **Terminal powered on, network-reachable (TCP 65), showing connected/idle**
-- [ ] Rotated `WINDCAVE_HIT_KEY` in `.env.local`
+- [x] **Seal inspected; serial matches `3425240086`**
+- [x] **Terminal powered on, network-reachable, responding**
+- [x] `WINDCAVE_HIT_KEY` in `.env.local`
 - [x] `actions.ts` — `requireStaff()` on all three actions (start / poll / press)
 - [x] Test panel with 1s polling, in-flight guard, 120-tick cap, raw output
 - [x] `/admin/terminal-test` page, staff-guarded, temporary nav link
-- [ ] **Physical terminal wakes and prompts**
-- [ ] All eight checks in step 5 recorded
-- [x] Envelope corrected in Phase 01 against PXHIT v2.3 — awaiting live re-verification
-- [ ] Findings written into `docs/windcave-integration.md`
+- [x] **Physical terminal wakes and prompts**
+- [x] Live checks recorded; envelope corrections fed back into Phase 01
+- [x] Envelope **verified against the live terminal** — 5 corrections found, all fixed
+- [x] Findings written into `docs/windcave-integration.md`
 - [x] `lint` / `build` / `tsc` / 72 tests green
 
 ## Success Criteria

@@ -62,6 +62,15 @@ export type HitStatus = {
   receipt?: string;
   result?: HitResult;
   /**
+   * Envelope-level rejection: `<Response Code="XX">message</Response>`.
+   * The service uses this shape — not `Result` — when it refuses the request
+   * outright (bad field, missing tag). Distinct from a declined card.
+   */
+  errorCode?: string;
+  errorMessage?: string;
+  /** The outbound request XML, credentials redacted. Diagnostics only. */
+  rawRequest?: string;
+  /**
    * The unparsed response body. Diagnostics only — when the envelope is wrong
    * the parsed fields come back `undefined` and hide the reason, so the raw XML
    * is the only thing that shows it. Never rendered to customers.

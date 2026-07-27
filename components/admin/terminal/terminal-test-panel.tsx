@@ -7,8 +7,15 @@ import {
   pressTestButton,
   startTestPurchase,
 } from '@/app/admin/terminal-test/actions';
-import type { SpikeResult } from '@/app/admin/terminal-test/spike-config';
-import type { HitButtonValue, HitStatus } from '@/lib/windcave/hit-types';
+import {
+  DEFAULT_TEST_AMOUNT,
+  MAX_TEST_AMOUNT,
+  type SpikeResult,
+} from '@/app/admin/terminal-test/spike-config';
+import type { HitButton, HitButtonValue, HitStatus } from '@/lib/windcave/hit-types';
+
+import { TerminalDebugPanels, TerminalResultCard } from './terminal-debug-panels';
+import { TerminalDisplay, TerminalRejection } from './terminal-display';
 
 const POLL_MS = 1000;
 /** ~2 minutes. Past this the terminal has almost certainly gone quiet. */
@@ -16,10 +23,20 @@ const MAX_TICKS = 120;
 
 type Phase = 'idle' | 'running' | 'complete' | 'error';
 
-export function TerminalTestPanel({ amount }: { amount: string }) {
+/** Whichever soft button the terminal is currently offering, if any. */
+function offeredButton(status: HitStatus | null): { name: 'B1' | 'B2'; button: HitButton } | null {
+  if (status?.b2?.enabled) return { name: 'B2', button: status.b2 };
+  if (status?.b1?.enabled) return { name: 'B1', button: status.b1 };
+  return null;
+}
+
+export function TerminalTestPanel({ currency }: { currency: string }) {
+  const [amount, setAmount] = useState(DEFAULT_TEST_AMOUNT.toFixed(2));
   const [phase, setPhase] = useState<Phase>('idle');
   const [txnRef, setTxnRef] = useState<string | null>(null);
   const [status, setStatus] = useState<HitStatus | null>(null);
+  /** The Purchase reply, kept separately — polling would overwrite it in 1s. */
+  const [purchase, setPurchase] = useState<HitStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ticks, setTicks] = useState(0);
 
@@ -40,12 +57,23 @@ export function TerminalTestPanel({ amount }: { amount: string }) {
   async function start() {
     setPhase('running');
     setStatus(null);
+    setPurchase(null);
     setError(null);
     setTicks(0);
     inFlight.current = false;
 
-    const result = await startTestPurchase();
-    if (result.ok) setTxnRef(result.txnRef);
+    const result = await startTestPurchase(amount);
+    if (result.ok) {
+      setTxnRef(result.txnRef);
+      setPurchase(result.status);
+      // A Purchase that returns already complete was rejected outright. Polling
+      // it would only report "TxnRef not matched" and bury the reason.
+      if (result.status.complete) {
+        setStatus(result.status);
+        setPhase('complete');
+        return;
+      }
+    }
     apply(result);
   }
 
@@ -79,19 +107,57 @@ export function TerminalTestPanel({ amount }: { amount: string }) {
     }
   }, [ticks, phase]);
 
-  const result = status?.result;
+  const running = phase === 'running';
+  const offered = offeredButton(status);
+  const rejection = purchase?.errorMessage ? purchase : status?.errorMessage ? status : null;
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="amount" className="text-sm font-semibold">
+            Amount ({currency})
+          </label>
+          <input
+            id="amount"
+            type="number"
+            step="0.01"
+            min="0.01"
+            max={MAX_TEST_AMOUNT}
+            value={amount}
+            disabled={running}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-40 rounded-[var(--radius-btn)] border border-line px-3 py-2 text-sm outline-none focus:border-brand disabled:opacity-50"
+          />
+        </div>
+
         <button
           type="button"
           onClick={start}
-          disabled={phase === 'running'}
+          disabled={running}
           className="rounded-[var(--radius-btn)] bg-brand px-4 py-2.5 text-sm font-semibold text-surface disabled:opacity-50"
         >
-          {phase === 'running' ? 'Sale in progress…' : `Start ${amount} test sale`}
+          {running ? 'Sale in progress…' : 'Charge terminal'}
         </button>
+
+        {/* The protocol has no Cancel transaction type — a sale can only be
+            stopped from here while the terminal is offering a button. */}
+        {running ? (
+          <button
+            type="button"
+            onClick={() => offered && press(offered.name, 'CANCEL')}
+            disabled={!offered}
+            title={
+              offered
+                ? `Sends ${offered.name}=CANCEL`
+                : 'The terminal is not offering a button right now — cancel on the device itself.'
+            }
+            className="rounded-[var(--radius-btn)] border border-line px-4 py-2.5 text-sm font-medium disabled:opacity-40"
+          >
+            Cancel
+          </button>
+        ) : null}
+
         {txnRef ? (
           <code className="text-xs text-ink/50">
             {txnRef} · {ticks} poll{ticks === 1 ? '' : 's'}
@@ -99,58 +165,18 @@ export function TerminalTestPanel({ amount }: { amount: string }) {
         ) : null}
       </div>
 
-      {/* The terminal's own words — rendered verbatim so this screen and the
-          device never disagree about what the cardholder is being asked. */}
-      {status ? (
-        <div className="rounded-[var(--radius-card)] border border-line bg-surface px-6 py-8 text-center">
-          <p className="font-display text-3xl leading-tight">{status.dl1 ?? '—'}</p>
-          {status.dl2 ? <p className="mt-1 text-lg text-ink/70">{status.dl2}</p> : null}
-
-          <div className="mt-5 flex justify-center gap-3">
-            {(['B1', 'B2'] as const).map((name) => {
-              const button = name === 'B1' ? status.b1 : status.b2;
-              if (!button?.enabled) return null;
-              return (
-                <button
-                  key={name}
-                  type="button"
-                  onClick={() => press(name, (button.label || 'YES') as HitButtonValue)}
-                  className="rounded-[var(--radius-btn)] border border-line px-4 py-2 text-sm font-medium"
-                >
-                  {button.label || name}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      {running && !offered ? (
+        <p className="text-xs text-ink/50">
+          Cancel is unavailable until the terminal offers a button. The protocol has no
+          POS-initiated cancel — until then, press the red key on the device.
+        </p>
       ) : null}
 
-      {result ? (
-        <div
-          className={`rounded-[var(--radius-card)] border px-5 py-4 ${
-            result.authorised ? 'border-brand' : 'border-line'
-          }`}
-        >
-          <p className="font-display text-2xl">
-            {result.authorised ? 'Approved' : 'Declined'}
-          </p>
-          <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-            <Row label="Response" value={result.responseText} />
-            <Row label="Auth code" value={result.authCode} />
-            <Row label="Card" value={result.cardNumber} />
-            <Row label="Type" value={result.cardType} />
-            <Row label="Windcave txn" value={result.transactionId} />
-            <Row
-              label="Amount"
-              value={result.amountCents !== undefined ? `${result.amountCents}c` : undefined}
-            />
-            <Row
-              label="Tip"
-              value={result.tipCents !== undefined ? `${result.tipCents}c` : undefined}
-            />
-          </dl>
-        </div>
-      ) : null}
+      {rejection ? <TerminalRejection status={rejection} /> : null}
+
+      {status && !rejection ? <TerminalDisplay status={status} onPress={press} /> : null}
+
+      {status?.result ? <TerminalResultCard result={status.result} /> : null}
 
       {error ? (
         <div className="rounded-[var(--radius-card)] border border-brand bg-surface px-5 py-4">
@@ -160,35 +186,7 @@ export function TerminalTestPanel({ amount }: { amount: string }) {
         </div>
       ) : null}
 
-      {status ? (
-        <div className="flex flex-col gap-3">
-          {/* Raw first: when the envelope is wrong the parsed view is all
-              undefined, and only this shows why. */}
-          <details className="rounded-[var(--radius-card)] border border-line bg-surface px-5 py-4">
-            <summary className="cursor-pointer text-sm font-semibold">Raw response XML</summary>
-            <pre className="mt-3 overflow-x-auto text-xs whitespace-pre-wrap">
-              {status.raw ?? '(none)'}
-            </pre>
-          </details>
-
-          <details className="rounded-[var(--radius-card)] border border-line bg-surface px-5 py-4">
-            <summary className="cursor-pointer text-sm font-semibold">Parsed response</summary>
-            <pre className="mt-3 overflow-x-auto text-xs">
-              {JSON.stringify({ ...status, raw: undefined }, null, 2)}
-            </pre>
-          </details>
-        </div>
-      ) : null}
+      <TerminalDebugPanels purchase={purchase} latest={status} />
     </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value?: string }) {
-  if (!value) return null;
-  return (
-    <>
-      <dt className="text-ink/50">{label}</dt>
-      <dd className="font-medium">{value}</dd>
-    </>
   );
 }

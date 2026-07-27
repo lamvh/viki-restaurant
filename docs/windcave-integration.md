@@ -243,6 +243,26 @@ is populated.
 
 **`Complete` terminates the loop — not `ReCo`.** `Amount` is a `D.CC` string.
 
+### Envelope — confirmed against the live UAT terminal
+
+Verified by running real transactions, not read off the spec. Several of these
+contradict a plain reading of the documentation samples, so change them only with
+evidence:
+
+| Fact | Detail |
+|---|---|
+| Root element | `<Scr action="doScrHIT" user="…" key="…">` — **`user` and `key` are attributes**, not child elements |
+| Field order | **Matters.** The service validates a sequence: `Amount, Cur, TxnType, Station, TxnRef, DeviceId, PosName, PosVersion, VendorId, MRef`. Wrong order is rejected |
+| `VendorId` | **Required.** Omitting it returns `Missing tag VendorID`. Spec sample spells it `VendorId`; the error message spells it `VendorID` |
+| Rejection envelope | `<Scr><Response Code="XX">message</Response><TransactionIsComplete>1</TransactionIsComplete></Scr>` — no `Complete`, no `ReCo`, no `Result`. Must be parsed separately or the reason is lost |
+| `Complete` | Two spellings in play: `Complete` on a normal reply, `TransactionIsComplete` on a rejection |
+| Button press | A **separate `TxnType=UI`** request (`UiType=Bn`, `Name`, `Val`) — not a field on Status |
+| `B1`/`B2` | Elements with an `en` attribute (`1` = enabled); the label is the text content |
+| Result fields | Two-letter codes: `AP` (1/0 approved), `AC`, `RC`, `RT`, `TR`, `CN`, `CT` |
+| Result amounts | `AmtA`, `AmtS`, `AmtT` are **integer cents**, not `D.CC` strings |
+| Cancelling | **No `Cancel` TxnType exists.** A sale can be stopped from the POS only while the terminal offers a button (`Val=CANCEL`); otherwise it must be cancelled on the device |
+| `PJ` | "TxnRef not matched" — the transaction was never registered, usually because the Purchase itself was rejected |
+
 ### Behaviour confirmed for this account
 
 | | |
