@@ -1,8 +1,8 @@
+import type { MenuCategory } from '@/types/menu';
 // JSON-LD structured data builders, derived from the same data sources as the UI
 // so schema stays in sync with what's on the page.
 
 import { RESTAURANT } from '@/data/restaurant';
-import { MENU } from '@/data/menu';
 import { SITE_URL } from './site';
 
 /** Restaurant schema for the homepage (local business + hours + menu link). */
@@ -40,13 +40,13 @@ export function restaurantJsonLd() {
 }
 
 /** Menu schema for the menu page (sections + items + prices). */
-export function menuJsonLd() {
+export function menuJsonLd(menu: MenuCategory[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Menu',
     name: `${RESTAURANT.name} Menu`,
     url: `${SITE_URL}/menu`,
-    hasMenuSection: MENU.map((category) => ({
+    hasMenuSection: menu.map((category) => ({
       '@type': 'MenuSection',
       name: category.name,
       hasMenuItem: category.items.map((item) => ({

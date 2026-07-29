@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MENU } from '@/data/menu';
+import { useMenu } from './menu-provider';
 
 /** Sticky category navigation; highlights the section currently in view. */
 export function CategoryChips() {
-  const [active, setActive] = useState(MENU[0]?.id ?? '');
+  const menu = useMenu();
+  const [active, setActive] = useState(menu[0]?.id ?? '');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -17,12 +18,12 @@ export function CategoryChips() {
       // Trigger when a section sits within the middle band of the viewport.
       { rootMargin: '-40% 0px -55% 0px' },
     );
-    for (const category of MENU) {
+    for (const category of menu) {
       const el = document.getElementById(category.id);
       if (el) observer.observe(el);
     }
     return () => observer.disconnect();
-  }, []);
+  }, [menu]);
 
   return (
     <nav
@@ -30,7 +31,7 @@ export function CategoryChips() {
       className="sticky top-[var(--header-h)] z-30 -mx-4 border-b border-line bg-surface/90 px-4 py-2 backdrop-blur"
     >
       <div className="flex gap-2 overflow-x-auto">
-        {MENU.map((category) => {
+        {menu.map((category) => {
           const isActive = active === category.id;
           return (
             <a

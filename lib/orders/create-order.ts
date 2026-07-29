@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { getMenuItems } from '@/lib/db/get-menu';
 import { totals } from '@/lib/pricing';
 import { createServiceClient } from '@/lib/supabase/service-client';
 import type { CheckoutPayload } from '@/types/cart';
@@ -27,7 +28,8 @@ export type CreateOrderResult =
  * uses, so what is shown and what is charged cannot drift.
  */
 export async function createOrder(payload: CheckoutPayload): Promise<CreateOrderResult> {
-  const rebuilt = rebuildCart(payload.lines);
+  // Live menu prices — the database when configured, the static file otherwise.
+  const rebuilt = rebuildCart(payload.lines, await getMenuItems());
   if (!rebuilt.ok) return { ok: false, error: rebuilt.error };
 
   const t = totals(rebuilt.lines, payload.service);

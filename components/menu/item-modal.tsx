@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import type { MenuItem, OptionGroup as OptionGroupType } from '@/types/menu';
 import { useCartStore } from '@/store/cart-store';
-import { findItem } from '@/data/menu';
 import {
   buildCartLine,
   defaultSelections,
@@ -11,6 +10,7 @@ import {
   type Selections,
 } from '@/lib/build-cart-line';
 import { useFocusTrap } from '@/lib/use-focus-trap';
+import { useMenuItem } from './menu-provider';
 import { OptionGroup } from './option-group';
 import { ImageSlot } from '@/components/ui/image-slot';
 import { Money } from '@/components/ui/money';
@@ -18,7 +18,7 @@ import { Money } from '@/components/ui/money';
 /** Global item-modal mount. Renders nothing unless a menu item is open. */
 export function ItemModal() {
   const modalItemId = useCartStore((s) => s.modalItemId);
-  const item = modalItemId ? findItem(modalItemId) : undefined;
+  const item = useMenuItem(modalItemId);
   // Key by id so the panel's local selection/qty/notes reset per item.
   return item ? <ItemModalPanel key={item.id} item={item} /> : null;
 }

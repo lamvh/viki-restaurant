@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { featuredItems } from '@/data/menu';
+import { getFeaturedItems } from '@/lib/db/get-menu';
 import { DishCard } from '@/components/ui/dish-card';
 
 /** "Popular right now" — the featured dishes grid on the homepage. */
-export function PopularDishes() {
-  const items = featuredItems();
+export async function PopularDishes() {
+  const items = await getFeaturedItems();
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">

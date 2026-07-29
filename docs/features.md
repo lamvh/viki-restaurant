@@ -19,6 +19,9 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | Route guards | Empty-cart redirect (hydration-safe) | ✅ |
 | Server-side orders | Prices rebuilt from the menu; orders persisted to Supabase | ✅ |
 | Staff order list | `/admin/orders` — charge to terminal, settle as cash | ✅ |
+| Order management | Kitchen flow new → preparing → ready → completed, cancel, status filters | ✅ |
+| Menu management | `/admin/menu` — edit name/description/price, hide, feature, add, delete | ✅ |
+| DB-backed menu | Public site, till and pricing all read the database (static file is the fallback) | ✅ |
 | Counter till | `/admin/pos` — ring up a walk-in, charge card or cash | ✅ |
 | Terminal payment | Windcave HIT on the CHU200TP; poll, buttons, recovery | ✅ |
 | Payment audit trail | `payment_events` records every terminal interaction | ✅ |

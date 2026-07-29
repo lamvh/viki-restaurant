@@ -3,7 +3,9 @@
 import { revalidatePath } from 'next/cache';
 
 import { requireStaff } from '@/lib/auth/require-role';
+import type { OrderStatus } from '@/lib/orders/order-status';
 import { settleOrderAsCash, startTerminalPayment } from '@/lib/orders/terminal-payment';
+import { updateOrderStatus } from '@/lib/orders/update-order-status';
 
 import type { TerminalActionResult } from './terminal-action-result';
 
@@ -26,5 +28,15 @@ export async function markOrderPaidCash(orderId: string): Promise<TerminalAction
 
   const result = await settleOrderAsCash(orderId);
   revalidatePath('/admin/orders');
+  return result;
+}
+
+/** Moves an order through the kitchen flow. Transition validated server-side. */
+export async function advanceOrderStatus(orderId: string, to: OrderStatus) {
+  await requireStaff();
+
+  const result = await updateOrderStatus(orderId, to);
+  revalidatePath('/admin/orders');
+  revalidatePath('/admin');
   return result;
 }

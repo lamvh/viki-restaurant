@@ -2,42 +2,56 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ItemModal } from './item-modal';
+import { MenuProvider } from './menu-provider';
 import { useCartStore } from '@/store/cart-store';
+import type { MenuCategory } from '@/types/menu';
 
 // The modal's option/price engine is exercised against a controlled fixture with
 // option groups, so this test stays independent of the live menu (whose real
-// dishes carry no add-on options).
-vi.mock('@/data/menu', () => ({
-  findItem: (id: string) =>
-    id === 'phobo'
-      ? {
-          id: 'phobo',
-          name: 'Phở Bò',
-          desc: 'Fixture item for option-engine tests.',
-          price: 16,
-          groups: [
-            {
-              id: 'phobo-size',
-              title: 'Size',
-              type: 'single',
-              choices: [
-                { id: 'regular', label: 'Regular', price: 0 },
-                { id: 'large', label: 'Large', price: 3 },
-              ],
-            },
-            {
-              id: 'phobo-addons',
-              title: 'Add-ons',
-              type: 'multi',
-              choices: [
-                { id: 'brisket', label: 'Extra brisket', price: 4 },
-                { id: 'noodles', label: 'Extra noodles', price: 2 },
-              ],
-            },
-          ],
-        }
-      : undefined,
-}));
+// dishes carry no add-on options). The menu now arrives through context rather
+// than a module import.
+const MENU: MenuCategory[] = [
+  {
+    id: 'pho',
+    name: 'Phở',
+    items: [
+      {
+        id: 'phobo',
+        name: 'Phở Bò',
+        desc: 'Fixture item for option-engine tests.',
+        price: 16,
+        groups: [
+          {
+            id: 'phobo-size',
+            title: 'Size',
+            type: 'single',
+            choices: [
+              { id: 'regular', label: 'Regular', price: 0 },
+              { id: 'large', label: 'Large', price: 3 },
+            ],
+          },
+          {
+            id: 'phobo-addons',
+            title: 'Add-ons',
+            type: 'multi',
+            choices: [
+              { id: 'brisket', label: 'Extra brisket', price: 4 },
+              { id: 'noodles', label: 'Extra noodles', price: 2 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];
+
+function renderModal() {
+  return render(
+    <MenuProvider menu={MENU}>
+      <ItemModal />
+    </MenuProvider>,
+  );
+}
 
 function reset() {
   localStorage.clear();
@@ -55,14 +69,14 @@ const addButton = () => screen.getByRole('button', { name: /add to order/i });
 
 describe('ItemModal', () => {
   it('renders nothing when no item is open', () => {
-    const { container } = render(<ItemModal />);
+    const { container } = renderModal();
     expect(container).toBeEmptyDOMElement();
   });
 
   it('updates the line total as options change and commits the line to the store', async () => {
     const user = userEvent.setup();
     useCartStore.getState().openItem('phobo'); // base $16
-    render(<ItemModal />);
+    renderModal();
 
     // Default: Regular size (+0), no add-ons.
     expect(addButton()).toHaveTextContent('$16.00');
@@ -87,7 +101,7 @@ describe('ItemModal', () => {
   it('multiplies the total by quantity', async () => {
     const user = userEvent.setup();
     useCartStore.getState().openItem('phobo');
-    render(<ItemModal />);
+    renderModal();
 
     await user.click(screen.getByRole('button', { name: /increase quantity/i }));
     expect(addButton()).toHaveTextContent('$32.00'); // 16 × 2

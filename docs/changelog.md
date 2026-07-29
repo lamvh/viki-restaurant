@@ -2,6 +2,39 @@
 
 All notable changes to this project are recorded here, newest first.
 
+## 2026-07-28
+
+- **Admin rebuilt to the "Viki Admin" design.** New shell (dark rail with a
+  topbar alternative, mobile header + bottom tabs, warm admin-only palette) and
+  a rebuild of the four data-backed sections. Scope was deliberately limited to
+  what the schema can feed; Tables, homepage content, Printers, Payments and
+  End of day are designed but not built, and appear in the nav disabled.
+  - **Overview** — sales/orders/avg-order KPIs with a real vs-yesterday delta, a
+    seven-day sales chart, the live kitchen queue, and today's top dishes joined
+    from `order_items`. Aggregation is pure and unit-tested
+    (`lib/admin/dashboard-aggregate.ts`); the read still degrades to zeroes so
+    the dashboard always renders.
+  - **Orders** — the table became a card list plus a server-rendered detail
+    panel. Filters and selection moved into the URL, so a view is shareable and
+    a status change refreshes list and panel together.
+  - **Menu** — per-category sections became a flat grid with category tabs and a
+    modal editor; the editor can now also move a dish between categories and set
+    its dietary tags (`sanitiseTags` rejects anything outside the known set
+    rather than partially writing).
+  - **Counter** — full-height two-pane till: dish tiles carrying the running
+    quantity, a ticket panel, and a payment sheet offering the two methods that
+    exist. On a narrow screen the ticket collapses to a summary bar and sheet.
+  - **Palette isolation:** admin colours are a separate `--color-admin-*` token
+    set, so the customer-facing pages are untouched.
+  - **Deliberate divergences from the mock**, all because nothing backs them:
+    the loyalty-points KPI (points are per-cart, never stored) is replaced with
+    open orders; POS dine-in/takeaway tabs and table chips are dropped (`service`
+    is `pickup | delivery`); the payment modal offers card and cash but no bill
+    splitting or tipping; the title-bar search box is omitted. The GST 15% line
+    is display-only, derived from the total (`lib/pricing-gst.ts`) — NZ prices
+    are GST-inclusive, so it reveals tax rather than adding it, and
+    `lib/pricing.ts` is untouched.
+
 ## 2026-07-27
 
 - **Terminal payment (Windcave HIT):** Card-present payment on the physical

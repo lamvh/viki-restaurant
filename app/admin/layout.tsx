@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
-import { AdminSidebar } from '@/components/admin/layout/admin-sidebar';
-import { AdminTopbar } from '@/components/admin/layout/admin-topbar';
+import { AdminShell } from '@/components/admin/layout/admin-shell';
+import { countNewOrders } from '@/lib/db/count-new-orders';
 import { getSessionUser } from '@/lib/auth/get-session-user';
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Admin shell (sidebar + top bar), rendered only for a signed-in user.
+ * Admin shell (navigation + chrome), rendered only for a signed-in user.
  *
  * `/admin/login` sits inside this segment, so it is wrapped by this layout too.
  * That means an unauthenticated request must still render its children — bare,
@@ -27,13 +27,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!user) return <>{children}</>;
 
+  const newOrderCount = await countNewOrders();
+
   return (
-    <div className="flex min-h-screen bg-surface-alt text-ink">
-      <AdminSidebar role={user.role} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <AdminTopbar user={user} />
-        <main className="flex-1 px-6 py-8">{children}</main>
-      </div>
-    </div>
+    <AdminShell user={user} newOrderCount={newOrderCount}>
+      {children}
+    </AdminShell>
   );
 }

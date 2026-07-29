@@ -13,6 +13,8 @@ export type StaffOrder = {
   customerPhone: string | null;
   hitTxnRef: string | null;
   createdAt: string;
+  /** "1× Phở Bò · 2× Viki Wings" — the card's one-line preview. */
+  itemsSummary: string;
 };
 
 /** Staff-guarded recent-orders read for the admin order screen. */
@@ -31,7 +33,7 @@ export async function listOrders(limit = 50): Promise<StaffOrder[]> {
   const { data, error } = await supabase
     .from('orders')
     .select(
-      'id, reference, service, total, status, payment_status, payment_method, customer_name, customer_phone, hit_txn_ref, created_at',
+      'id, reference, service, total, status, payment_status, payment_method, customer_name, customer_phone, hit_txn_ref, created_at, order_items(item_name, quantity)',
     )
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -50,5 +52,8 @@ export async function listOrders(limit = 50): Promise<StaffOrder[]> {
     customerPhone: o.customer_phone,
     hitTxnRef: o.hit_txn_ref,
     createdAt: o.created_at,
+    itemsSummary: (o.order_items ?? [])
+      .map((item) => `${item.quantity}× ${item.item_name}`)
+      .join(' · '),
   }));
 }

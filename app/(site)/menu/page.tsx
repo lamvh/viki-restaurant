@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { MENU } from '@/data/menu';
+import { getMenu } from '@/lib/db/get-menu';
 import { CategoryChips } from '@/components/menu/category-chips';
 import { MenuCategorySection } from '@/components/menu/menu-category';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -12,10 +12,12 @@ export const metadata: Metadata = {
   alternates: { canonical: '/menu' },
 };
 
-export default function MenuPage() {
+export default async function MenuPage() {
+  const menu = await getMenu();
+
   return (
     <main className="mx-auto max-w-4xl px-4 pb-16">
-      <JsonLd data={menuJsonLd()} />
+      <JsonLd data={menuJsonLd(menu)} />
       <header className="py-8">
         <h1 className="text-4xl">Menu</h1>
         <p className="mt-2 text-muted">
@@ -26,7 +28,7 @@ export default function MenuPage() {
       <CategoryChips />
 
       <div className="mt-8 flex flex-col gap-12">
-        {MENU.map((category) => (
+        {menu.map((category) => (
           <MenuCategorySection key={category.id} category={category} />
         ))}
       </div>

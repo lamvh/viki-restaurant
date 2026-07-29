@@ -83,6 +83,8 @@ money is moving.
 | ✅ | **Remove the terminal spike surface** | `/admin/terminal-test` deleted in Phase 07, along with its panel and debug dumps. `terminal-display.tsx` survives — the real dialog reuses it. |
 | 🟡 | **Should cash settlement be admin-only?** | Marking an order paid in cash is the one action that records money received with no gateway trail. Currently any staff role can. Say the word and it becomes `requireAdmin()`. |
 | ✅ | **Full counter POS** | **Built 2026-07-27** at `/admin/pos`, reversing the earlier deferral. The original scope assumed every order arrived online first, which is backwards for a counter terminal. Reuses `createOrder`, so pricing and recovery are shared. |
+| 🟠 | **Option groups have no admin UI** | `/admin/menu` edits name, description, price, availability and featured. Option groups and choices are readable by `getMenu()` but can only be created by seeding. No live dish uses them yet, so nothing is broken — but a "Large / add egg" dish cannot be built from the admin today. |
+| 🟡 | **Category management** | Categories can be renamed or reordered only by seeding. Adding a dish works; adding a category does not. |
 | 🟡 | **Option customisation at the till** | Tapping a dish uses its default options. Fine today — no menu item has option groups — but a "Large / add egg" dish would need a modal at the counter. |
 | 🟡 | **Reprint a card receipt** | `getReceipt(txnRef, duplicate)` is implemented in `hit-client.ts` but not yet surfaced in the UI. Useful when a customer asks for another copy of the card slip. |
 | ⚪ | **Refunds via HIT** | `TxnType=Refund` exists in the protocol. Using Payline is fine at low volume. |
@@ -96,7 +98,7 @@ money is moving.
 | | Item | Notes |
 |---|---|---|
 | 🟠 | **Reconcile admin-dashboard plan status** | `plans/20260722-viki-admin-dashboard/plan.md` marks phases 03–08 pending, but commit `4c795b5` ("full-stack admin dashboard with settings and user management") suggests more shipped than the file records. Verify what actually exists and correct the plan — a stale plan is worse than no plan. |
-| 🟠 | **Menu data is static, not DB-backed** | `data/menu/*.ts` is still the source of truth; `lib/db` has only `get-dashboard-metrics.ts`. The payment work reads prices from the static files through one function so the later swap is a single call site. Admin menu edits do not currently drive the public site. |
+| ✅ | **Menu data is static, not DB-backed** | Rewired: `lib/db/get-menu.ts` reads the database and serves `data/menu/*` only as a fallback when Supabase is unconfigured, unreachable or empty. Public menu, homepage, till and — critically — `createOrder` pricing all go through it. |
 
 ---
 

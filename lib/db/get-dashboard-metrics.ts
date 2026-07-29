@@ -1,41 +1,29 @@
 import { requireStaff } from '@/lib/auth/require-role';
 import { createServiceClient } from '@/lib/supabase/service-client';
+import {
+  buildDashboard,
+  EMPTY_DASHBOARD,
+  type DashboardItemRow,
+  type DashboardMetrics,
+  type DashboardOrderRow,
+} from '@/lib/admin/dashboard-aggregate';
 
-export type OrderStatus = 'new' | 'preparing' | 'ready' | 'completed' | 'cancelled';
+export type { DashboardMetrics } from '@/lib/admin/dashboard-aggregate';
 
-export type RecentOrder = {
-  id: string;
-  service: string;
-  total: number;
-  status: OrderStatus;
-  createdAt: string;
-};
-
-export type DashboardMetrics = {
-  todayCount: number;
-  todayRevenue: number;
-  avgOrder: number;
-  openCount: number;
-  recent: RecentOrder[];
-};
-
-const EMPTY: DashboardMetrics = {
-  todayCount: 0,
-  todayRevenue: 0,
-  avgOrder: 0,
-  openCount: 0,
-  recent: [],
-};
-
-function startOfToday(): string {
+/** Local midnight, `days` ago — day boundaries follow the restaurant's clock. */
+function startOfDayAgo(days: number): Date {
   const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  day.setDate(day.getDate() - days);
+  return day;
 }
 
 /**
- * Staff-guarded dashboard aggregate read from `orders`. Degrades to zeroes if
- * the orders table has no rows yet or is temporarily unreadable, so the
- * dashboard always renders.
+ * Staff-guarded aggregate for the Overview screen.
+ *
+ * Degrades to zeroes if the orders table is empty or temporarily unreadable, so
+ * the dashboard always renders — a manager opening the panel mid-service should
+ * never be met with an error page.
  */
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   await requireStaff();
@@ -49,34 +37,41 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   // valid staff user.
   const supabase = createServiceClient();
 
+  // Six days back plus today gives the seven bars the chart draws.
+  const windowStart = startOfDayAgo(6);
+  const todayStart = startOfDayAgo(0).toISOString();
+
   const { data, error } = await supabase
     .from('orders')
-    .select('id, service, total, status, created_at')
-    // Orders still awaiting payment are not real work and not real revenue.
-    .neq('status', 'pending_payment')
-    .order('created_at', { ascending: false })
-    .limit(50);
+    .select('id, total, status, created_at')
+    .gte('created_at', windowStart.toISOString())
+    .order('created_at', { ascending: false });
 
-  if (error || !data) return EMPTY;
+  if (error || !data) return EMPTY_DASHBOARD;
 
-  const since = startOfToday();
-  const today = data.filter((o) => o.created_at >= since);
-  const todayRevenue = today.reduce((sum, o) => sum + Number(o.total), 0);
-  const openCount = data.filter(
-    (o) => o.status === 'new' || o.status === 'preparing',
-  ).length;
+  const orders: DashboardOrderRow[] = data.map((o) => ({
+    total: Number(o.total),
+    status: o.status,
+    createdAt: o.created_at,
+  }));
 
-  return {
-    todayCount: today.length,
-    todayRevenue,
-    avgOrder: today.length > 0 ? todayRevenue / today.length : 0,
-    openCount,
-    recent: data.slice(0, 8).map((o) => ({
-      id: o.id,
-      service: o.service,
-      total: Number(o.total),
-      status: o.status as OrderStatus,
-      createdAt: o.created_at,
-    })),
-  };
+  // Only today's line items are read — "Top dishes today" is the sole consumer,
+  // and pulling a week of items to discard six days of them is wasted bandwidth.
+  const todayOrderIds = data.filter((o) => o.created_at >= todayStart).map((o) => o.id);
+
+  let todayItems: DashboardItemRow[] = [];
+  if (todayOrderIds.length > 0) {
+    const { data: itemRows } = await supabase
+      .from('order_items')
+      .select('item_name, quantity, line_total')
+      .in('order_id', todayOrderIds);
+
+    todayItems = (itemRows ?? []).map((row) => ({
+      itemName: row.item_name,
+      quantity: Number(row.quantity),
+      lineTotal: Number(row.line_total),
+    }));
+  }
+
+  return buildDashboard(orders, todayItems, new Date());
 }

@@ -91,9 +91,11 @@ export function TerminalPaymentDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4">
-      <div className="w-full max-w-md rounded-[var(--radius-card)] border border-line bg-surface-alt p-6">
-        <p className="text-xs uppercase tracking-wide text-ink/50">Card payment · {reference}</p>
+    <div className="fixed inset-0 z-95 flex items-end justify-center bg-[rgb(23_19_15/0.6)] min-[820px]:items-center min-[820px]:px-4">
+      <div className="w-full max-w-[470px] rounded-t-[20px] bg-admin-bg p-6 min-[820px]:rounded-[18px]">
+        <p className="text-[10.5px] font-bold uppercase tracking-[1.2px] text-admin-faint">
+          Card payment · {reference}
+        </p>
 
         <div className="mt-4 flex flex-col gap-4">
           {status?.errorMessage ? <TerminalRejection status={status} /> : null}
@@ -103,7 +105,7 @@ export function TerminalPaymentDialog({
           ) : null}
 
           {!status && !error ? (
-            <p className="py-8 text-center text-sm text-ink/60">Waking the terminal…</p>
+            <p className="py-8 text-center text-sm text-admin-muted">Waking the terminal…</p>
           ) : null}
 
           {settled === 'paid' ? (
@@ -117,7 +119,7 @@ export function TerminalPaymentDialog({
                 href={`/admin/orders/${orderId}/receipt?print=1`}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-[var(--radius-btn)] bg-brand px-4 py-3 text-center text-sm font-semibold text-surface"
+                className="rounded-[11px] bg-brand px-4 py-3.5 text-center text-sm font-bold text-white"
               >
                 Print bill
               </a>
@@ -143,7 +145,7 @@ export function TerminalPaymentDialog({
           ) : null}
 
           {error ? (
-            <p role="alert" className="text-sm font-medium text-brand">
+            <p role="alert" className="text-[13px] font-semibold text-admin-red">
               {error}
             </p>
           ) : null}
@@ -166,7 +168,7 @@ export function TerminalPaymentDialog({
         </div>
 
         {!done ? (
-          <p className="mt-3 text-xs text-ink/40">
+          <p className="mt-3 text-xs text-admin-faint">
             Hiding this does not cancel the sale — it keeps running on the terminal.
           </p>
         ) : null}
@@ -175,19 +177,21 @@ export function TerminalPaymentDialog({
   );
 }
 
-const PRIMARY =
-  'rounded-[var(--radius-btn)] bg-brand px-4 py-2 text-sm font-semibold text-surface';
-const SECONDARY = 'rounded-[var(--radius-btn)] border border-line px-4 py-2 text-sm font-medium';
+const PRIMARY = 'rounded-[11px] bg-brand px-4 py-2.5 text-sm font-bold text-white';
+const SECONDARY =
+  'rounded-[11px] border border-admin-line-strong bg-white px-4 py-2.5 text-sm font-bold text-admin-ink';
 
 function Outcome({ tone, title, body }: { tone: 'good' | 'bad'; title: string; body: string }) {
   return (
     <div
-      className={`rounded-[var(--radius-card)] border px-5 py-4 ${
-        tone === 'good' ? 'border-brand' : 'border-line'
+      className={`rounded-[14px] border px-5 py-4 ${
+        tone === 'good'
+          ? 'border-brand/40 bg-[#DFF0E6]'
+          : 'border-admin-red/30 bg-[#F7E3DF]'
       }`}
     >
       <p className="font-display text-2xl">{title}</p>
-      <p className="mt-1 text-sm text-ink/70">{body}</p>
+      <p className="mt-1 text-sm text-admin-muted">{body}</p>
     </div>
   );
 }

@@ -15,8 +15,10 @@ sections (hero, story, location) are server components where possible.
 | `/menu` | Menu | sticky category chips + item rows; opens item modal |
 | `/checkout` | Checkout | details + live order summary; submits to the server |
 | `/order/[token]` | Order confirmed | server-rendered from the database, `noindex` |
+| `/admin` | Overview | KPIs, 7-day sales chart, live kitchen queue, top dishes |
+| `/admin/menu` | Menu admin | dish grid + modal editor; drives the public site |
 | `/admin/pos` | Counter till | ring up a walk-in, then charge card or cash |
-| `/admin/orders` | Staff orders | charge to the card terminal, settle as cash |
+| `/admin/orders` | Staff orders | card list + detail panel; charge or settle cash |
 | `/api/admin/terminal/status` | Terminal relay | staff-guarded poll/button proxy |
 
 **Global overlays** (mounted in `app/layout.tsx`, driven by store): cart drawer,
@@ -25,13 +27,41 @@ item modal.
 **Guards:** `/checkout` with empty cart → `/menu`; unknown `/order/[token]` → 404;
 all `/admin/*` gated by `middleware.ts` **and** a per-page `requireStaff()`.
 
+## Admin shell
+
+`app/admin/layout.tsx` resolves the session, counts `new` orders for the nav
+badge, and hands both to `AdminShell`. When there is no user it renders children
+bare — `/admin/login` lives inside this segment, and wrapping it in the shell
+would leave nobody able to sign in.
+
+| Concern | Module |
+|---|---|
+| Nav model (single source for rail, topbar, tabs) | `lib/admin/nav-items.ts` |
+| Chrome + layout preference | `components/admin/layout/admin-shell.tsx` |
+| Section title bar (page-owned, for page-specific actions) | `components/admin/layout/admin-page-header.tsx` |
+| Status / service badge palettes | `lib/admin/status-meta.ts` |
+| Overview aggregation (pure, unit-tested) | `lib/admin/dashboard-aggregate.ts` |
+
+**Layout:** rail (default) or topbar, persisted per device in `localStorage`
+under `viki.admin.layout`; below 820px a mobile header plus bottom tabs replace
+both. The first paint is always the rail — reading storage during render would
+differ between server and client and break hydration.
+
+**Orders selection** lives in the URL (`?status=`, `?service=`, `?order=`), so
+the detail panel is server-rendered with no client fetch and any view is
+shareable and reloadable.
+
+**Unbuilt sections** (Content, Payments, End of day, Printers) appear in the
+admin-only nav group as disabled rows, so the nav never links to a 404.
+
 ## Payment
 
 Two channels share one order path.
 
 | Layer | Module |
 |---|---|
-| Repricing boundary | `lib/orders/rebuild-cart.ts` — rebuilds lines from the menu |
+| Menu source | `lib/db/get-menu.ts` — database, falling back to `data/menu/*` |
+| Repricing boundary | `lib/orders/rebuild-cart.ts` — rebuilds lines from the menu it is given |
 | Order creation | `lib/orders/create-order.ts` — re-totals, persists via service role |
 | Counter sale | `app/admin/pos/actions.ts` — creates then charges, via the same path |
 | Terminal (HIT) | `lib/windcave/hit-{env,types,xml,client}.ts` |

@@ -9,6 +9,8 @@ import type { OrderView } from './get-order-by-token';
 export type StaffOrderView = OrderView & {
   cardReceipt: string | null;
   hitTxnRef: string | null;
+  /** Delivery address; null for pickup and counter orders. */
+  address: string | null;
 };
 
 /**
@@ -25,7 +27,7 @@ export async function getOrderForStaff(orderId: string): Promise<StaffOrderView 
   const { data } = await supabase
     .from('orders')
     .select(
-      'reference, customer_name, customer_phone, service, status, payment_status, payment_method, subtotal, total, created_at, card_receipt, hit_txn_ref, order_items(item_name, quantity, unit_price, line_total, options, notes)',
+      'reference, customer_name, customer_phone, service, status, payment_status, payment_method, subtotal, total, created_at, address, card_receipt, hit_txn_ref, order_items(item_name, quantity, unit_price, line_total, options, notes)',
     )
     .eq('id', orderId)
     .single();
@@ -45,6 +47,7 @@ export async function getOrderForStaff(orderId: string): Promise<StaffOrderView 
     createdAt: data.created_at,
     cardReceipt: data.card_receipt,
     hitTxnRef: data.hit_txn_ref,
+    address: data.address,
     items: (data.order_items ?? []).map((row) => ({
       itemName: row.item_name,
       quantity: row.quantity,

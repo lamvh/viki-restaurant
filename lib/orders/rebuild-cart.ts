@@ -1,6 +1,6 @@
-import { findItem } from '@/data/menu';
 import { buildCartLine, type Selections } from '@/lib/build-cart-line';
 import type { CartLine, CheckoutLineInput } from '@/types/cart';
+import type { MenuItem } from '@/types/menu';
 
 export type RebuildResult = { ok: true; lines: CartLine[] } | { ok: false; error: string };
 
@@ -17,8 +17,14 @@ const MAX_QTY = 50;
  * costs is irrelevant to what gets charged. Any unknown id or malformed
  * selection is a hard rejection rather than a silently dropped option — a
  * silently dropped option would change the price without telling anyone.
+ *
+ * The menu is passed in rather than imported so this stays pure and testable,
+ * and so the caller decides where prices come from — today the database, with
+ * the static file as a fallback.
  */
-export function rebuildCart(input: CheckoutLineInput[]): RebuildResult {
+export function rebuildCart(input: CheckoutLineInput[], menu: MenuItem[]): RebuildResult {
+  const byId = new Map(menu.map((item) => [item.id, item]));
+
   if (!Array.isArray(input) || input.length === 0) {
     return { ok: false, error: 'Your cart is empty.' };
   }
@@ -26,7 +32,7 @@ export function rebuildCart(input: CheckoutLineInput[]): RebuildResult {
   const lines: CartLine[] = [];
 
   for (const raw of input) {
-    const item = findItem(String(raw?.itemId ?? ''));
+    const item = byId.get(String(raw?.itemId ?? ''));
     if (!item) return { ok: false, error: `Unknown menu item: ${raw?.itemId}` };
 
     const qty = Number(raw.qty);

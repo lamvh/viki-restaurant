@@ -15,6 +15,30 @@
   --color-surface: #ffffff;
   --color-surface-alt: #fafafa;
 
+  /*
+   * Admin-only palette. The manager UI uses a warm cream/brown scheme that the
+   * customer-facing site does not — these are deliberately a separate, prefixed
+   * token set rather than an override of the public ones, so restyling the
+   * admin can never leak into the marketing or ordering pages.
+   *
+   * --color-brand (#2f6b4f) is shared: the admin design uses the same green.
+   */
+  --color-admin-bg: #f5ede0;
+  --color-admin-card: #fbf6ec;
+  --color-admin-ink: #26201a;
+  --color-admin-muted: #6e6355;
+  --color-admin-faint: #9a8f7d;
+  --color-admin-well: #efe6d6;
+  --color-admin-panel: #ece6dc;
+  --color-admin-red: #b23a2c;
+  --color-admin-gold: #e0a24a;
+  --color-admin-line: rgb(38 32 26 / 0.1);
+  --color-admin-line-strong: rgb(38 32 26 / 0.18);
+  /* Text colours for use *on* the dark ink chrome (rail, topbar, panels). */
+  --color-admin-rail-dim: #a89c8a;
+  --color-admin-rail-faint: #8a7f6e;
+  --color-admin-rail-bright: #c9bda8;
+
   --radius-card: 16px;
   --radius-btn: 10px;
   --radius-pill: 999px;
