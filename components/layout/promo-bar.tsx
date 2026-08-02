@@ -1,10 +1,26 @@
-/** Thin promotional bar across the top of every page. */
+import Link from 'next/link';
+
+import { ORDERING } from '@/data/restaurant';
+import { moneyLabel } from '@/lib/format';
+
+/** Thin offer bar across the top of every page. */
 export function PromoBar() {
   return (
-    <div className="bg-ink text-surface">
-      <p className="mx-auto max-w-6xl px-4 py-2 text-center text-xs tracking-wide">
-        10% off orders over $30 · Flat $4 delivery · Pickup ready in 15–20 min
-      </p>
+    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 bg-brand px-5 py-[9px] text-center text-[12.5px] font-semibold text-surface">
+      <span>{ORDERING.promo}</span>
+      <span aria-hidden="true" className="opacity-50">
+        ·
+      </span>
+      <span>
+        Flat {moneyLabel(ORDERING.deliveryFee)} delivery within {ORDERING.deliveryRadiusKm} km of
+        Glenfield Mall
+      </span>
+      <span aria-hidden="true" className="opacity-50">
+        ·
+      </span>
+      <Link href="/#delivery-zone" className="text-[#CFE8D9] underline hover:text-surface">
+        Check your suburb
+      </Link>
     </div>
   );
 }

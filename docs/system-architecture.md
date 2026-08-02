@@ -5,13 +5,13 @@
 Next.js 15 App Router app. Real routes (not a single-page state machine) give real
 URLs, SSR content, and refresh/deep-link support. Interactive chrome (header, cart
 drawer, item modal, checkout) are client components reading a Zustand store; content
-sections (hero, story, location) are server components where possible.
+sections (hero, kitchen band, find us) are server components where possible.
 
 ## Routes
 
 | Route | Screen | Notes |
 |---|---|---|
-| `/` | Home | hero, popular dishes, story band, location |
+| `/` | Home | hero, popular dishes, **full inline menu**, our kitchen, delivery zone, find us. ISR 15m |
 | `/menu` | Menu | sticky category chips + item rows; opens item modal |
 | `/checkout` | Checkout | details + live order summary; submits to the server |
 | `/order/[token]` | Order confirmed | server-rendered from the database, `noindex` |
@@ -99,9 +99,15 @@ already exist in `0005`.
 
 - `components/layout/` — `promo-bar` (server), `site-header` (client: cart count +
   service toggle, hydration-guarded), `service-toggle` (client), `site-footer` (server).
-  Chrome mounts in `app/layout.tsx`.
-- `components/home/` — `hero`, `popular-dishes`, `story-band`, `location-block` (server);
-  composed in `app/page.tsx`.
+  Chrome mounts in `app/(site)/layout.tsx`, alongside `components/cart/cart-bar`
+  (client sticky order summary, rendered only once the cart is non-empty).
+- `components/home/` — `hero`, `kitchen-band`, `find-us`, `dish-card`, `dish-row`
+  (server); `popular-dishes`, `home-menu`, `delivery-zone`, `add-to-cart-button`
+  (client — category tabs, suburb chips, cart writes); `use-restaurant-hour`
+  (client hook, seeded from a server-rendered prop so hydration matches).
+  Composed in `app/(site)/page.tsx`.
+  The lunch/dinner switch is `lib/home/service-window.ts` (pure, pinned to
+  `Pacific/Auckland`); which dishes it locks is `lib/menu/dinner-only.ts`.
 - `components/ui/` — `image-slot` (client: real image or placeholder + load fallback),
   `dish-card`, `tag-badge`, `money`.
 - `components/menu/` — `category-chips` (client scrollspy), `menu-category` (server),

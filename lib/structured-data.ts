@@ -2,7 +2,7 @@ import type { MenuCategory } from '@/types/menu';
 // JSON-LD structured data builders, derived from the same data sources as the UI
 // so schema stays in sync with what's on the page.
 
-import { RESTAURANT } from '@/data/restaurant';
+import { RESTAURANT, SOCIALS } from '@/data/restaurant';
 import { SITE_URL } from './site';
 
 /** Restaurant schema for the homepage (local business + hours + menu link). */
@@ -20,6 +20,9 @@ export function restaurantJsonLd() {
     telephone: RESTAURANT.phone,
     priceRange: '$$',
     acceptsReservations: false,
+    // The profiles Google uses to reconcile this business with its own records.
+    sameAs: SOCIALS.map((social) => social.href),
+    hasMap: RESTAURANT.mapsUrl,
     address: {
       '@type': 'PostalAddress',
       streetAddress: RESTAURANT.postal.street,

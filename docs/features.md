@@ -5,8 +5,10 @@ Status legend: ✅ done · 🚧 in progress · ⬜ pending
 | Feature | Description | Status |
 |---|---|---|
 | Project scaffold | Runnable Next.js 15 app, tooling, tokens, fonts, test harness | ✅ |
-| Homepage | Hero, popular dishes, story band, location (1b Fresh) | ✅ |
-| Layout chrome | Promo bar, sticky header (cart + service), footer | ✅ |
+| Homepage | Hero, popular dishes, full inline menu, kitchen band, delivery zone, find us | ✅ |
+| Delivery zone checker | Suburb chips → in/out of the 6 km zone. Guidance only; checkout is not gated | ✅ |
+| Service window | Dinner-only dishes lock until 5pm, on the restaurant's clock | ✅ |
+| Layout chrome | Green promo bar, sticky header (anchors + service + cart), dark footer, sticky cart bar | ✅ |
 | Menu page | Sticky category chips (scrollspy) + item rows | ✅ |
 | Item modal | Option groups, qty, special instructions; live price | ✅ |
 | Cart drawer | Line qty controls, empty state, live totals, focus-trapped | ✅ |

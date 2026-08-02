@@ -49,8 +49,10 @@
 
 :root {
   color-scheme: light;
-  /* Sticky-header height — the menu category bar sticks directly beneath it. */
-  --header-h: 61px;
+  /* Sticky-header height. The menu category bar sticks directly beneath it, and
+     the homepage sections use it as their scroll-margin so an anchor jump does
+     not land underneath the header. */
+  --header-h: 69px;
 }
 
 html {

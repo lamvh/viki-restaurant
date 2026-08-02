@@ -1,3 +1,4 @@
+import { CartBar } from '@/components/cart/cart-bar';
 import { CartDrawer } from '@/components/cart/cart-drawer';
 import { PromoBar } from '@/components/layout/promo-bar';
 import { SiteFooter } from '@/components/layout/site-footer';
@@ -18,6 +19,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <SiteHeader />
       {children}
       <SiteFooter />
+      <CartBar />
       <ItemModal />
       <CartDrawer />
     </MenuProvider>

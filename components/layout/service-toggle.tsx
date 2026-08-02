@@ -1,15 +1,15 @@
 'use client';
 
-import { useCartStore } from '@/store/cart-store';
 import { useHydrated } from '@/lib/use-hydrated';
+import { useCartStore } from '@/store/cart-store';
 import type { Service } from '@/types/cart';
 
 const OPTIONS: { value: Service; label: string }[] = [
-  { value: 'pickup', label: 'Pickup' },
   { value: 'delivery', label: 'Delivery' },
+  { value: 'pickup', label: 'Pickup' },
 ];
 
-/** Pickup / Delivery segmented control bound to the store's `service`. */
+/** Delivery / Pickup segmented control bound to the store's `service`. */
 export function ServiceToggle({ className = '' }: { className?: string }) {
   const service = useCartStore((s) => s.service);
   const setService = useCartStore((s) => s.setService);
@@ -19,7 +19,7 @@ export function ServiceToggle({ className = '' }: { className?: string }) {
     <div
       role="group"
       aria-label="Order type"
-      className={`inline-flex rounded-[var(--radius-pill)] border border-line bg-surface-alt p-0.5 ${className}`}
+      className={`inline-flex overflow-hidden rounded-lg border border-line-strong ${className}`}
     >
       {OPTIONS.map((opt) => {
         // Before hydration, show the SSR default (pickup) as active.
@@ -27,10 +27,11 @@ export function ServiceToggle({ className = '' }: { className?: string }) {
         return (
           <button
             key={opt.value}
+            type="button"
             aria-pressed={active}
             onClick={() => setService(opt.value)}
-            className={`rounded-[var(--radius-pill)] px-3 py-1 text-sm font-medium transition-colors ${
-              active ? 'bg-brand text-surface' : 'text-subtle hover:text-ink'
+            className={`px-3.5 py-2 text-[12.5px] font-semibold transition-colors ${
+              active ? 'bg-brand text-surface' : 'text-muted hover:text-ink'
             }`}
           >
             {opt.label}

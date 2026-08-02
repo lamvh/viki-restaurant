@@ -2,6 +2,55 @@
 
 All notable changes to this project are recorded here, newest first.
 
+## 2026-08-03
+
+- **Homepage rebuilt to the "Viki Homepage" design.** The page went from four
+  short sections to the full single-page pitch: hero with live open status,
+  popular dishes, the **complete menu inline**, an "Our kitchen" band, a delivery
+  zone checker and an expanded "Find us". Chrome was rebuilt with it — green
+  promo bar, section-anchor header nav, dark four-column footer, and a sticky
+  cart bar along the bottom.
+  - **Menu source:** `getMenu()`, the same database read `/menu` and `createOrder`
+    use. The design's 40 hard-coded dishes were **not** imported — their prices
+    conflict with the real menu, and pricing has one source of truth.
+  - **Add to cart:** a dish with option groups opens the existing customisation
+    modal; a plain dish goes straight into the cart. One-tap add would otherwise
+    silently commit a default the customer never chose.
+  - **Compact rows** for categories where no dish has a photo — how the design
+    separates drinks and extras, expressed as a data rule rather than a
+    hard-coded category name.
+  - **Dinner-only dishes** render locked with "Available from 5pm" until the
+    charcoal grill is on. Derived from the "Dinner only" marker already in the
+    dish description (`lib/menu/dinner-only.ts`); a `dinner_only` column is the
+    durable fix.
+  - **One clock:** service state is computed for `Pacific/Auckland`, seeded from
+    the server and handed to the client as a prop, so a UTC host and a visitor
+    abroad agree and hydration matches. `revalidate = 900` keeps the page
+    cacheable and stops it being static or dynamic purely as a side effect of
+    whether Supabase is configured.
+  - **Business facts corrected** in `data/restaurant.ts` and the JSON-LD:
+    Shop 503A / Cnr Glenfield Road & Downing Street, `+64 9 216 1686`, 11:00am–
+    8:00pm seven days. `sameAs` (three social profiles) and `hasMap` added.
+    Delivery fee and the 10%/$30 promo now derive from `lib/pricing.ts` so the
+    quoted figures cannot drift from what is charged.
+  - **Dietary pills** adopt the design's tinted style with bilingual tooltips,
+    but still render only tags the kitchen has confirmed — the menu data
+    deliberately leaves `tags` empty, and a wrong "gluten free" is a safety
+    issue, not a cosmetic one. The design's invented allergen data was not
+    imported.
+  - **Not carried over:** Vietnamese dish names (the menu holds one name per
+    dish; inventing translations for real food is not a rendering decision), and
+    per-category blurbs (no column yet — tracked as Phase 04 of the admin plan).
+  - `/menu` is unchanged and still self-canonical. Both pages carry the menu;
+    only `/menu` emits the `Menu` JSON-LD node, so crawlers see one
+    machine-readable menu rather than two.
+  - Replaced: `story-band.tsx`, `location-block.tsx`. New: `home-menu`,
+    `dish-card`, `dish-row`, `add-to-cart-button`, `kitchen-band`,
+    `delivery-zone`, `find-us`, `cart-bar`, `use-restaurant-hour`.
+  - Verified: `tsc` clean, lint clean, **192 tests pass** (was 182; +10 new for
+    `service-window` and `dinner-only`), production build clean, `/`, `/menu`
+    and `/checkout` all 200 against a live Supabase-configured dev server.
+
 ## 2026-07-28
 
 - **Admin rebuilt to the "Viki Admin" design.** New shell (dark rail with a
